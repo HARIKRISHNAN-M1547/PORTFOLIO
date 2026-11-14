@@ -27,6 +27,8 @@ h2{font-size:clamp(2rem,5vw,3.6rem);font-weight:800;font-stretch:110%;line-heigh
 nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;padding:18px 6vw;background:linear-gradient(var(--ink),transparent)}
 nav b{font-weight:800} nav div a{margin-left:22px;text-decoration:none;color:var(--muted);font-size:.95rem}
 nav div a:hover{color:#fff}
+nav button{margin-left:22px;background:none;border:0;color:var(--muted);font-size:1rem;cursor:pointer;line-height:1}
+nav button:hover{color:#fff}
 
 /* ===== 2. HERO: big words slide behind your photo as you scroll ===== */
 .hero{position:relative;height:100vh;min-height:620px;padding:0;overflow:hidden;
@@ -83,8 +85,15 @@ button.btn.playing{background:var(--blue);border-color:var(--blue)}
 /* ===== 3. PROJECT CARDS (angled corners) ===== */
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
 .card{padding:30px 26px 26px;min-height:240px;display:flex;flex-direction:column;justify-content:space-between;
-  clip-path:polygon(0 0,86% 0,100% 14%,100% 100%,0 100%);transition:transform .25s;color:var(--ink)}
+  clip-path:polygon(0 0,86% 0,100% 14%,100% 100%,0 100%);transition:transform .25s;color:var(--ink);position:relative;--x:50%;--y:50%;--r:0px}
 .card:hover{transform:translateY(-8px)}
+/* 10. PROJECT REVEAL: same circle effect as the hero photo, showing the project picture */
+.card.proj{transition:opacity 1s,transform 1s,--r .3s ease}
+.card .reveal{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;z-index:1;
+  -webkit-mask-image:radial-gradient(circle var(--r) at var(--x) var(--y),#000 96%,transparent 100%);
+          mask-image:radial-gradient(circle var(--r) at var(--x) var(--y),#000 96%,transparent 100%)}
+.card.proj.revealing{--r:90px}                       /* touch screens: shows for a moment after a tap */
+@media (hover:hover){.card.proj:hover{--r:90px}}     /* mouse: circle size is 90px */
 .card h3{font-size:1.6rem;font-weight:800;font-stretch:105%;line-height:1.1}
 .card p{font-size:.98rem;margin:14px 0}
 .card small{font-weight:700}
@@ -124,7 +133,7 @@ footer{padding:28px 6vw;color:var(--muted);font-size:.9rem;border-top:1px solid 
 </head>
 <body>
 
-<nav><a href="#top" style="text-decoration:none"><b>HM.</b></a><div><a href="#about">About</a><a href="#projects">Projects</a><a href="#experience">Experience</a><a href="#contact">Contact</a></div></nav>
+<nav><a href="#top" style="text-decoration:none"><b>HM.</b></a><div><a href="#about">About</a><a href="#projects">Projects</a><a href="#experience">Experience</a><a href="#contact">Contact</a><button id="muteBtn" type="button" aria-label="Turn sound on or off" aria-pressed="false" title="Sound on">🔊</button></div></nav>
 
 <!-- ===== HERO ===== -->
 <header class="hero" id="top">
@@ -174,12 +183,12 @@ I'm driven by curiosity and a hands-on approach to learning, turning ideas into 
 <section id="projects">
   <h2 class="rv">What I've been<br>working on</h2>
   <div class="cards">
-    <article class="card c-blue rv"><div><h3>NEPTUNE</h3><p>Underwater ROV, my B.Tech main project.</p></div><small>ROV · Control · Electronics</small></article>
-    <article class="card c-cream rv"><div><h3>MUSHROOM CULTIVATION SYSTEM</h3><p>Closed-loop control of humidity, ventilation and lighting.</p></div><small>Sensors · Automation</small></article>
-    <article class="card c-teal rv"><div><h3>RESCUE GUARDIAN</h3><p>ESP32 rover with Blynk app and web dashboard.</p></div><small>ESP32 · Blynk · Web</small></article>
-    <article class="card c-cream rv"><div><h3>BATTLE BOT</h3><p>Car controlled from a web page over its own Wi-Fi.</p></div><small>ESP8266 · L298N</small></article>
-    <article class="card c-blue rv"><div><h3>ORBY</h3><p>Interactive desktop eyes, controlled from a phone.</p></div><small>ESP8266 · OLED</small></article>
-    <article class="card c-teal rv"><div><h3>MORE ON GITHUB</h3><p>Code and circuits for all my projects.</p></div><small><a href="https://github.com/HARIKRISHNAN-M1547">github.com/HARIKRISHNAN-M1547</a></small></article>
+    <article class="card proj c-blue rv"><img class="reveal" src="images/neptune.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><div><h3>NEPTUNE</h3><p>Underwater ROV, my B.Tech main project.</p></div><small>ROV · Control · Electronics</small></article>
+    <article class="card proj c-cream rv"><img class="reveal" src="images/mushroom.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><div><h3>MUSHROOM CULTIVATION SYSTEM</h3><p>Closed-loop control of humidity, ventilation and lighting.</p></div><small>Sensors · Automation</small></article>
+    <article class="card proj c-teal rv"><img class="reveal" src="images/rescue.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><div><h3>RESCUE GUARDIAN</h3><p>ESP32 rover with Blynk app and web dashboard.</p></div><small>ESP32 · Blynk · Web</small></article>
+    <article class="card proj c-cream rv"><img class="reveal" src="images/battlebot.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><div><h3>BATTLE BOT</h3><p>Car controlled from a web page over its own Wi-Fi.</p></div><small>ESP8266 · L298N</small></article>
+    <article class="card proj c-blue rv"><img class="reveal" src="images/orby.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><div><h3>ORBY</h3><p>Interactive desktop eyes, controlled from a phone.</p></div><small>ESP8266 · OLED</small></article>
+    <article class="card proj c-teal rv"><img class="reveal" src="images/github.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><div><h3>MORE ON GITHUB</h3><p>Code and circuits for all my projects.</p></div><small><a href="https://github.com/HARIKRISHNAN-M1547">github.com/HARIKRISHNAN-M1547</a></small></article>
   </div>
 </section>
 
@@ -233,6 +242,8 @@ const alt=document.getElementById('alt'), ph=document.querySelector('.photo');
 alt.onerror=()=>{alt.onerror=null;alt.classList.add('fx');alt.src='images/profile.png'};
 ph.addEventListener('pointermove',e=>{const r=ph.getBoundingClientRect();
   ph.style.setProperty('--x',(e.clientX-r.left)+'px');ph.style.setProperty('--y',(e.clientY-r.top)+'px')});
+/* sound switch state (used by the hover voice and the project blips) */
+let muted=false; try{muted=localStorage.getItem('hm-muted')==='1'}catch(e){}
 /* 8. VOICE: plays an mp3 if it exists, otherwise the browser reads the text aloud */
 const INTRO="Hi, I'm Harikrishnan, a B.Tech Electronics and Communication student at SNGCET Payyanur. I love building hardware that works in the real world, like my underwater ROV project NEPTUNE and an automated mushroom cultivation system. I have interned in IoT and in Python and machine learning. Scroll down to see my projects, and feel free to get in touch.";
 const HELLO="System online. Hi, I'm Hari. I build robots, sensors and smart systems that work in the real world.";
@@ -273,9 +284,39 @@ let ptype='mouse';
 ph.addEventListener('pointerdown',e=>{ ptype=e.pointerType;
   const r=ph.getBoundingClientRect();
   ph.style.setProperty('--x',(e.clientX-r.left)+'px');ph.style.setProperty('--y',(e.clientY-r.top)+'px') });
-ph.addEventListener('pointerenter',e=>{ if(e.pointerType==='mouse') heroVoice.start() });
+ph.addEventListener('pointerenter',e=>{ if(e.pointerType==='mouse'&&!muted) heroVoice.start() });
 ph.addEventListener('pointerleave',e=>{ if(e.pointerType==='mouse') heroVoice.stop() });
 ph.addEventListener('click',()=>{ if(ptype!=='mouse') heroVoice.toggle(); else if(!heroVoice.isPlaying()) heroVoice.start() });
+
+/* 10. SOUND SWITCH + PROJECT REVEAL SOUND (audio/scan.mp3, pitch changes per card) */
+const muteBtn=document.getElementById('muteBtn');
+function setMuted(m){
+  muted=m; muteBtn.textContent=m?'🔇':'🔊'; muteBtn.title=m?'Sound off':'Sound on'; muteBtn.setAttribute('aria-pressed',m);
+  if(m) stopAll();
+  try{localStorage.setItem('hm-muted',m?'1':'0')}catch(e){}
+}
+setMuted(muted);
+muteBtn.onclick=()=>setMuted(!muted);
+
+const RATES=[0.9,1,1.1,1.2,1.3,1.4];           /* pitch for each project card */
+const pre=new Audio('audio/scan.mp3'); pre.preload='auto';
+let lastBlip=0;
+function blip(rate){
+  const now=Date.now(); if(muted||now-lastBlip<120) return; lastBlip=now;
+  const a=new Audio('audio/scan.mp3'); a.volume=.35;
+  a.preservesPitch=false; a.webkitPreservesPitch=false; a.playbackRate=rate;
+  a.play().catch(()=>{});
+}
+document.querySelectorAll('.card.proj').forEach((card,i)=>{
+  const place=e=>{const r=card.getBoundingClientRect();
+    card.style.setProperty('--x',(e.clientX-r.left)+'px');card.style.setProperty('--y',(e.clientY-r.top)+'px')};
+  card.addEventListener('pointermove',place);
+  card.addEventListener('pointerdown',place);
+  card.addEventListener('pointerenter',e=>{
+    blip(RATES[i%RATES.length]);
+    if(e.pointerType!=='mouse'){ card.classList.add('revealing'); setTimeout(()=>card.classList.remove('revealing'),2500) }
+  });
+});
 
 /* 9. TYPING ANIMATION: the highlighted word types and deletes in a loop */
 const rot=document.getElementById('rot'), caret=document.querySelector('.caret');
