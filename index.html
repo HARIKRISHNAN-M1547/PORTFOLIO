@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
 /* ===== 1. COLORS: change these to restyle the whole site ===== */
 :root{
@@ -38,7 +38,8 @@ nav div a:hover{color:#fff}
 .photo{position:absolute;bottom:0;left:50%;transform:translateX(-50%);height:88%;z-index:2;display:flex;align-items:flex-end}
 @property --r{syntax:'<length>';inherits:true;initial-value:0px}
 .photo{position:absolute;cursor:none;--x:50%;--y:40%;--r:0px;transition:--r .35s ease}
-.photo:hover{--r:30px}
+.photo.talking{--r:30px}          /* touch screens: circle shows while the voice plays */
+@media (hover:hover){.photo:hover{--r:30px}}   /* mouse: circle shows while hovering */
 .photo img{height:100%;display:block}
 /* 7. CURSOR EFFECT: second image shows only inside a circle that follows the mouse */
 .photo img.alt{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;
@@ -51,9 +52,18 @@ nav div a:hover{color:#fff}
 .badge b{display:block;font-size:2rem;font-weight:800;line-height:1}
 .badge small{color:var(--muted)}
 .b1{left:6vw}.b2{right:6vw}
-.hello{position:absolute;z-index:3;top:16%;left:6vw;max-width:290px;
-  font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:500;line-height:1.5;color:#8fb0ff}
-.hello b{color:#fff;font-weight:600}
+/* HERO CAPTION (bottom-left): name + headline + sub-line */
+.hello{position:absolute;z-index:3;left:6vw;bottom:8%;max-width:23vw;min-width:270px;
+  font-family:'Space Grotesk',sans-serif;animation:up .9s .2s both;
+  padding-left:20px;border-left:3px solid var(--blue)}
+.hello .name{display:block;margin-bottom:12px;color:#8fb0ff;font-size:.95rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase}
+.hello h1{font-size:clamp(1.6rem,2.6vw,2.9rem);font-weight:700;line-height:1.12;letter-spacing:-.02em;color:#fff}
+.hello h1{min-height:3.4em}
+.hello h1 u{text-decoration:none;color:#4de1ff;text-shadow:0 0 22px rgba(77,225,255,.45)}
+.hello .caret{display:inline-block;width:3px;height:.85em;margin-left:4px;vertical-align:-.08em;background:#4de1ff;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hello p{margin-top:14px;color:#9fb4ff;font-size:.98rem;line-height:1.5}
+@keyframes up{from{opacity:0;transform:translateY(20px)}}
 
 /* ===== TICKER ===== */
 .ticker{background:var(--blue);overflow:hidden;white-space:nowrap;padding:14px 0;font-weight:800}
@@ -106,10 +116,10 @@ footer{padding:28px 6vw;color:var(--muted);font-size:.9rem;border-top:1px solid 
 
 @media(max-width:760px){
   .about,.contact{grid-template-columns:1fr}
-  .hello{display:none} .photo{height:70%} .badge{bottom:3%;padding:10px 14px}.badge b{font-size:1.3rem}
+  .hello{top:11%;bottom:auto;right:6vw;max-width:none;text-align:center;border-left:0;padding-left:0} .hello p{display:none} .hello h1{font-size:1.45rem;min-height:2.6em} .photo{height:70%} .badge{bottom:3%;padding:10px 14px}.badge b{font-size:1.3rem}
   nav div a:not(:last-child){display:none}
 }
-@media(prefers-reduced-motion:reduce){.ticker div{animation:none}.rv{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+@media(prefers-reduced-motion:reduce){.hello,.hello .caret{animation:none}.ticker div{animation:none}.rv{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
@@ -123,13 +133,19 @@ footer{padding:28px 6vw;color:var(--muted);font-size:.9rem;border-top:1px solid 
     <span>EMBEDDED</span><span class="star">★</span><span>IoT</span><span class="star">★</span><span>ROBOTICS</span><span class="star">★</span>
     <span>EMBEDDED</span><span class="star">★</span><span>IoT</span><span class="star">★</span><span>ROBOTICS</span><span class="star">★</span>
   </div></div>
-  <p class="hello">Hi, I’m Hari. I build <b>robots, sensors and smart systems</b> that work in the real world.</p>
+  <div class="hello">
+    <span class="name">Harikrishnan M</span>
+    <h1 aria-label="Building hardware that thinks and moves">Building hardware that <u id="rot">thinks</u><i class="caret"></i></h1>
+    <p>Embedded systems, IoT and robotics, designed to work in the real world.</p>
+  </div>
   <!-- 5. YOUR PHOTO: save a background-removed PNG as images/profile.png -->
   <div class="photo">
     <img src="images/profile.png" alt="Harikrishnan M" onerror="this.style.display='none';this.parentElement.querySelector('.ph').style.display='flex'">
     <img class="alt" id="alt" src="images/profile-alt.png" alt="" aria-hidden="true">
     <div class="ph">Add your photo<br>images/profile.png</div>
   </div>
+  <!-- 9. HOVER VOICE: optional recording at audio/hello.mp3 (otherwise the browser reads the text aloud) -->
+  <audio id="heroAudio" src="audio/hello.mp3" preload="none"></audio>
 </header>
 
 <div class="ticker"><div>
@@ -217,23 +233,65 @@ const alt=document.getElementById('alt'), ph=document.querySelector('.photo');
 alt.onerror=()=>{alt.onerror=null;alt.classList.add('fx');alt.src='images/profile.png'};
 ph.addEventListener('pointermove',e=>{const r=ph.getBoundingClientRect();
   ph.style.setProperty('--x',(e.clientX-r.left)+'px');ph.style.setProperty('--y',(e.clientY-r.top)+'px')});
-/* 8. VOICE INTRO: plays audio/about.mp3; if the file is missing, the browser reads the text below aloud */
+/* 8. VOICE: plays an mp3 if it exists, otherwise the browser reads the text aloud */
 const INTRO="Hi, I'm Harikrishnan, a B.Tech Electronics and Communication student at SNGCET Payyanur. I love building hardware that works in the real world, like my underwater ROV project NEPTUNE and an automated mushroom cultivation system. I have interned in IoT and in Python and machine learning. Scroll down to see my projects, and feel free to get in touch.";
-const v=document.getElementById('voice'), vb=document.getElementById('voiceBtn');
-const LABEL='▶ Listen to my intro';
-function idle(){vb.textContent=LABEL;vb.classList.remove('playing')}
-function busy(){vb.textContent='⏸ Pause';vb.classList.add('playing')}
-function speak(){
-  if(!('speechSynthesis' in window)) return idle();
-  const u=new SpeechSynthesisUtterance(INTRO); u.lang='en-IN'; u.onend=idle; u.onerror=idle;
-  speechSynthesis.speak(u); busy();
+const HELLO="System online. Hi, I'm Hari. I build robots, sensors and smart systems that work in the real world.";
+const voices=[];
+function stopAll(){ if('speechSynthesis' in window) speechSynthesis.cancel(); voices.forEach(x=>{x.audio.pause();x.reset()}) }
+function makeVoice(audio,text,onStart,onStop){
+  let playing=false, token=0;
+  const x={audio,reset(){playing=false;onStop()}};
+  voices.push(x);
+  const begin=()=>{playing=true;onStart()};
+  function speak(){
+    if(!('speechSynthesis' in window)) return x.reset();
+    const u=new SpeechSynthesisUtterance(text); u.lang='en-IN'; u.onend=x.reset;
+    u.onerror=e=>{ if(e.error!=='canceled'&&e.error!=='interrupted') x.reset() };
+    speechSynthesis.speak(u); begin();
+  }
+  x.start=()=>{ stopAll(); const t=++token; audio.currentTime=0;
+    audio.play().then(()=>{ if(t!==token){audio.pause();return} begin() }).catch(()=>{ if(t===token) speak() }) };
+  x.stop=()=>{ token++; if(playing) stopAll() };
+  x.toggle=()=>{ playing?x.stop():x.start() };
+  x.isPlaying=()=>playing;
+  audio.onended=x.reset;
+  return x;
 }
-vb.onclick=()=>{
-  if(speechSynthesis.speaking){speechSynthesis.cancel();return idle()}
-  if(!v.paused){v.pause();return idle()}
-  v.play().then(busy).catch(speak);
-};
-v.onended=idle;
+/* About button */
+const vb=document.getElementById('voiceBtn');
+const aboutVoice=makeVoice(document.getElementById('voice'),INTRO,
+  ()=>{vb.textContent='⏸ Pause';vb.classList.add('playing')},
+  ()=>{vb.textContent='▶ Listen to my intro';vb.classList.remove('playing')});
+vb.onclick=()=>aboutVoice.toggle();
+
+/* Hero photo: the voice plays while the robot circle is open (mouse hover), and stops when the cursor leaves.
+   Touch screens have no hover, so a tap starts it and a second tap stops it. */
+const heroVoice=makeVoice(document.getElementById('heroAudio'),HELLO,
+  ()=>ph.classList.add('talking'),
+  ()=>ph.classList.remove('talking'));
+let ptype='mouse';
+ph.addEventListener('pointerdown',e=>{ ptype=e.pointerType;
+  const r=ph.getBoundingClientRect();
+  ph.style.setProperty('--x',(e.clientX-r.left)+'px');ph.style.setProperty('--y',(e.clientY-r.top)+'px') });
+ph.addEventListener('pointerenter',e=>{ if(e.pointerType==='mouse') heroVoice.start() });
+ph.addEventListener('pointerleave',e=>{ if(e.pointerType==='mouse') heroVoice.stop() });
+ph.addEventListener('click',()=>{ if(ptype!=='mouse') heroVoice.toggle(); else if(!heroVoice.isPlaying()) heroVoice.start() });
+
+/* 9. TYPING ANIMATION: the highlighted word types and deletes in a loop */
+const rot=document.getElementById('rot'), caret=document.querySelector('.caret');
+const WORDS=['thinks','moves','senses','connects'];
+if(still){ rot.textContent='thinks and moves'; caret.style.display='none' }
+else{
+  let w=0,c=0,del=false;
+  (function tick(){
+    const word=WORDS[w];
+    rot.textContent=word.slice(0,c);
+    if(!del&&c<word.length){c++;setTimeout(tick,110)}
+    else if(!del){del=true;setTimeout(tick,1500)}
+    else if(c>0){c--;setTimeout(tick,55)}
+    else{del=false;w=(w+1)%WORDS.length;setTimeout(tick,300)}
+  })();
+}
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
 document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 </script>
