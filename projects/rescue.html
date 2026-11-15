@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RESCUE GUARDIAN | Rescue Rover | Harikrishnan M</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#050816;--panel:#0b1230;--blue:#2350ff;--sky:#6f93ff;--cyan:#4de1ff;--cream:#ece6d8;--teal:#19b5b0;--text:#e8ecff;--muted:#9aa4d0;--line:#16205a}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--text);font-family:'Archivo',system-ui,sans-serif;line-height:1.65;overflow-x:hidden}
+a{color:inherit}
+section{padding:80px 6vw;max-width:1200px;margin:0 auto}
+h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;font-stretch:110%;line-height:1.05;margin-bottom:28px}
+h2 small{display:block;font:500 .85rem 'Space Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--sky);margin-bottom:10px}
+p{color:var(--muted);max-width:70ch}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s,transform .9s}.rv.in{opacity:1;transform:none}
+
+/* top bar */
+.bar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:16px 6vw;background:linear-gradient(var(--ink),transparent)}
+.bar a{text-decoration:none;color:var(--muted);font-size:.95rem}.bar a:hover,.bar button:hover{color:#fff}
+.bar button{background:none;border:0;color:var(--muted);font-size:1rem;cursor:pointer}
+a:focus-visible,button:focus-visible,.node:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+/* hero */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 6vw 90px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 100%,#1a3cff 0%,#0a1650 45%,var(--ink) 85%)}
+.hero .in-wrap{position:relative;z-index:2;max-width:1200px;margin:0 auto;width:100%}
+.hero .tagline{font:500 1rem 'Space Grotesk',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan)}
+.hero h1{font-size:clamp(3.2rem,12vw,10rem);font-weight:900;font-stretch:125%;line-height:.95;color:#fff;margin:10px 0 18px}
+.hero p{font-size:1.15rem}
+.title{position:relative;display:inline-block;letter-spacing:.01em}
+.title span{display:inline-block}
+.title .o{color:transparent;-webkit-text-stroke:2px var(--cyan);text-shadow:0 0 28px rgba(77,225,255,.45)}
+.title .f{background:linear-gradient(180deg,#fff 10%,var(--cyan) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(35,80,255,.9))}
+.title::after{content:"";position:absolute;top:0;bottom:0;left:-30%;width:22%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);mix-blend-mode:overlay;animation:sweep 2.4s .5s ease-out 1 both;pointer-events:none}
+@keyframes sweep{from{left:-30%}to{left:115%}}
+.title-bar{display:block;width:min(420px,60%);height:6px;margin:6px 0 22px;border-radius:3px;background:repeating-linear-gradient(-45deg,var(--cyan) 0 10px,var(--blue) 10px 20px)}
+.bub{position:absolute;bottom:-30px;border-radius:50%;border:1px solid rgba(143,176,255,.45);animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-110vh) translateX(20px);opacity:0}}
+.video{margin-top:36px;border:1px solid rgba(111,147,255,.4);border-radius:16px;overflow:hidden;background:#071040;aspect-ratio:16/9;max-width:900px}
+.video video{width:100%;height:100%;display:block;background:#000}
+.video .empty{height:100%;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.stat{background:var(--panel);border:1px solid var(--line);padding:22px;clip-path:polygon(0 0,88% 0,100% 16%,100% 100%,0 100%)}
+.stat b{display:block;font-size:2.2rem;font-weight:800;color:var(--cyan);line-height:1.1}
+.stat span{color:var(--muted);font-size:.95rem}
+ul.plain{list-style:none;display:grid;gap:12px;max-width:80ch}
+ul.plain li{padding-left:22px;position:relative;color:var(--muted)}
+ul.plain li::before{content:"";position:absolute;left:0;top:.7em;width:8px;height:8px;background:var(--blue);border-radius:2px}
+
+/* block diagram */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;overflow-x:auto}
+.diagram svg{display:block;min-width:640px;width:100%;height:auto}
+.node rect{fill:#141f55;stroke:var(--sky);stroke-width:1.5;transition:.2s}
+.node.y rect{fill:#3a3410;stroke:#e6c84a}
+.node.r rect{fill:#1d2f80;stroke:var(--cyan)}
+.node text{fill:#e8ecff;font:600 13px 'Space Grotesk',sans-serif;text-anchor:middle;pointer-events:none}
+.node text.s{font-weight:500;font-size:11.5px;fill:#b9c4ef}
+.node{cursor:pointer;outline:none}
+.node:hover rect,.node:focus rect,.node.on rect{fill:var(--blue);stroke:var(--cyan)}
+.ln{stroke:#8da2e8;stroke-width:1.6;fill:none}
+.lbl{fill:#8da2e8;font:500 11px 'Space Grotesk',sans-serif;text-anchor:middle}
+.info{margin-top:16px;padding:18px 20px;border-left:4px solid var(--cyan);background:#0a1240;border-radius:4px 12px 12px 4px;min-height:96px}
+.info b{display:block;color:#fff;margin-bottom:4px;font-size:1.05rem}
+
+/* tables */
+.tbl{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow-x:auto;max-width:900px}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{text-align:left;padding:12px 18px;border-bottom:1px solid var(--line);color:var(--muted);white-space:nowrap}
+th{color:var(--cyan);font:700 .9rem 'Space Grotesk',sans-serif}
+td:first-child{color:#fff;font-weight:600}
+tr:last-child td{border-bottom:0}
+.sub{margin:34px 0 12px;font:700 1.1rem 'Space Grotesk',sans-serif;color:#fff}
+.note{margin-top:14px;font-size:.9rem}
+
+/* components */
+.chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.grp{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.grp h3{font:700 1rem 'Space Grotesk',sans-serif;color:var(--cyan);margin-bottom:8px}
+.grp li{list-style:none;color:var(--muted);font-size:.95rem;padding:3px 0}
+
+/* back link */
+.back{display:inline-block;margin-top:28px;padding:14px 26px;border:2px solid var(--blue);border-radius:999px;font-weight:700;text-decoration:none;transition:.2s}
+.back:hover{background:var(--blue)}
+footer{padding:28px 6vw;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
+@media(prefers-reduced-motion:reduce){.title::after{display:none}.bub{display:none}.rv{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+
+.eyes{display:flex;gap:18px;padding:16px 24px;background:#02050f;border:1px solid rgba(111,147,255,.4);border-radius:14px;width:max-content;margin:6px 0 22px;box-shadow:0 0 30px rgba(35,80,255,.35)}
+.eyes i{display:block;width:34px;height:40px;background:var(--cyan);border-radius:10px;box-shadow:0 0 16px var(--cyan);animation:blink 5s infinite}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+@media(prefers-reduced-motion:reduce){.eyes i{animation:none}}
+
+.circuit{position:relative;background:#fff;border-radius:14px;padding:8px}
+.stage{position:relative;cursor:crosshair}
+.stage img{width:100%;display:block;border-radius:8px}
+.zone{position:absolute;border:2px solid transparent;border-radius:12px;transition:.2s;outline:none}
+.zone:hover,.zone:focus,.zone.on{border-color:#0a8fb0;background:rgba(77,225,255,.16);box-shadow:0 0 0 2px rgba(77,225,255,.4),0 0 24px rgba(77,225,255,.5)}
+.lens{position:absolute;z-index:3;width:170px;height:170px;border-radius:50%;border:3px solid var(--cyan);pointer-events:none;opacity:0;transition:opacity .15s;
+  background-color:#fff;background-repeat:no-repeat;background-origin:border-box;box-shadow:0 8px 30px rgba(0,0,0,.5),0 0 20px rgba(77,225,255,.6)}
+.lens.show{opacity:1}
+.full{display:block;margin:0 0 12px auto;background:rgba(5,8,22,.85);color:#fff;border:1px solid var(--sky);border-radius:999px;padding:8px 16px;font:600 .85rem 'Space Grotesk',sans-serif;cursor:pointer}
+.full:hover{background:var(--blue)}
+.viewer{display:none;position:fixed;inset:0;z-index:100;background:#050816;overflow:hidden;touch-action:none;cursor:grab}
+.viewer.open{display:block}
+.viewer img{position:absolute;left:0;top:0;max-width:none;transform-origin:0 0;user-select:none;-webkit-user-drag:none;background:#fff;border-radius:6px}
+.vbtns{position:fixed;top:14px;right:14px;z-index:101;display:flex;gap:8px}
+.vbtns button{background:var(--panel);color:#fff;border:1px solid var(--sky);border-radius:999px;min-width:42px;height:42px;padding:0 14px;font:600 1rem 'Space Grotesk',sans-serif;cursor:pointer}
+.vbtns button:hover{background:var(--blue)}
+.title.two{font-size:clamp(2.6rem,9vw,7.4rem)}
+.title.two span{display:block}
+.live{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--cyan);margin-right:10px;box-shadow:0 0 12px var(--cyan);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25;transform:scale(.7)}}
+@media(prefers-reduced-motion:reduce){.live{animation:none}}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;counter-reset:s}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.step b{display:block;font:700 1rem 'Space Grotesk',sans-serif;color:var(--cyan);margin-bottom:6px}
+.step b::before{counter-increment:s;content:counter(s) ". "}
+.step span{color:var(--muted);font-size:.95rem}
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.shots figure{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.shots img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;background:#000}
+.shots figcaption{padding:12px 16px;color:var(--muted);font-size:.9rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.two-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="bar"><a href="../index.html#projects">← Back to projects</a><button id="muteBtn" type="button" aria-label="Turn sound on or off" title="Sound on">🔊</button></div>
+
+<header class="hero">
+  <div class="in-wrap">
+    <p class="tagline"><span class="live" aria-hidden="true"></span>Disaster rescue rover · Mini project 2025-2026</p>
+    <h1 class="title two" aria-label="Rescue Guardian"><span class="o" aria-hidden="true">RESCUE</span><span class="f" aria-hidden="true">GUARDIAN</span></h1>
+    <span class="title-bar" aria-hidden="true"></span>
+    <p>A disaster rescue rover that detects survivors with a mmWave radar sensor, streams live video, tracks its GPS position and sounds an alert, all controlled from a Blynk app and a web dashboard.</p>
+    <!-- Put your animated video at videos/rescue.mp4 (the page shows a placeholder until it exists) -->
+    <div class="video">
+      <video id="demo" controls playsinline preload="metadata"><source src="../videos/rescue.mp4" type="video/mp4"></video>
+      <div class="empty" id="noVideo" style="display:none">Animated video goes here<br>(videos/rescue.mp4)</div>
+    </div>
+  </div>
+</header>
+
+<section class="rv">
+  <h2><small>Overview</small>What Rescue Guardian does</h2>
+  <p style="margin-bottom:26px">Earthquakes, floods and building collapses leave survivors trapped where rescuers cannot safely go. Rescue Guardian goes in first. An ESP32 reads a DFRobot C4001 human presence sensor and a GPS module, an ESP32-CAM streams live video, and a buzzer gives instant audio feedback when someone is detected. Operators watch the data and drive the rover from a Blynk app or a web dashboard.</p>
+  <div class="stats">
+    <div class="stat"><b>8 m</b><span>presence detection range of the C4001 radar</span></div>
+    <div class="stat"><b>~100°</b><span>horizontal field of view</span></div>
+    <div class="stat"><b>~2.5 m</b><span>GPS position accuracy (NEO-6M)</span></div>
+    <div class="stat"><b>2</b><span>ESP32 boards: rover controller + ESP32-CAM</span></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>The problem</small>Why this rover</h2>
+  <div class="two-col">
+    <div class="grp"><h3>Problem</h3><ul><li>Survivors are trapped in places that are hard to reach.</li><li>Unstable terrain and poor visibility put rescuers at risk.</li><li>Teams need to find survivors quickly and know exactly where they are.</li></ul></div>
+    <div class="grp"><h3>Solution</h3><ul><li>A rover with a C4001 radar sensor for human detection.</li><li>GPS for location and an ESP32-CAM for live video.</li><li>Remote control and monitoring through Blynk and a web dashboard, with buzzer alerts.</li></ul></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Objectives</small>What we set out to build</h2>
+  <ul class="plain">
+    <li>Detect human presence reliably using the DFRobot C4001 mmWave sensor.</li>
+    <li>Give operators live video and the rover's GPS location in real time.</li>
+    <li>Move the rover remotely in all four directions and rotate the camera with a stepper motor.</li>
+    <li>Alert immediately with a buzzer when a detection event occurs.</li>
+    <li>Use a modular design so each subsystem can be switched on or off to save resources.</li>
+    <li>Validate the design with Proteus simulation and hardware testing, with proper circuit protection.</li>
+  </ul>
+</section>
+
+<section class="rv">
+  <h2><small>Workflow</small>How a rescue run works</h2>
+  <div class="steps">
+    <div class="step"><b>Detection</b><span>The C4001 sensor identifies human presence.</span></div>
+    <div class="step"><b>Alert</b><span>The buzzer sounds to notify the operator.</span></div>
+    <div class="step"><b>Data transmission</b><span>GPS coordinates and live video go to the dashboard.</span></div>
+    <div class="step"><b>Control</b><span>The operator drives the rover and manages modules from the dashboard.</span></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Block diagram</small>How the system works</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 910 440" role="img" aria-label="Rescue Guardian block diagram: human detection module, ESP32-CAM and GPS feed the ESP32, which drives the web dashboard, DC motors and stepper motor">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8da2e8"/></marker></defs>
+      <g class="ln" marker-end="url(#ar)">
+        <path d="M270 60H400V180"/><path d="M270 220H340"/><path d="M270 380H400V260"/>
+        <path d="M510 180V60H640"/><path d="M570 220H640"/><path d="M510 260V380H640"/>
+      </g>
+      <circle r="4.5" fill="#4de1ff"><animateMotion dur="5s" repeatCount="indefinite" path="M270 60H400V180"/></circle>
+      <circle r="4.5" fill="#4de1ff"><animateMotion dur="3s" repeatCount="indefinite" path="M270 220H340"/></circle>
+      <circle r="4.5" fill="#4de1ff"><animateMotion dur="5s" repeatCount="indefinite" path="M270 380H400V260"/></circle>
+      <circle r="4.5" fill="#e6c84a"><animateMotion dur="3s" repeatCount="indefinite" path="M570 220H640"/></circle>
+      <circle r="4.5" fill="#e6c84a"><animateMotion dur="5s" repeatCount="indefinite" path="M510 180V60H640"/></circle>
+      <circle r="4.5" fill="#e6c84a"><animateMotion dur="5s" repeatCount="indefinite" path="M510 260V380H640"/></circle>
+
+      <g class="node" tabindex="0" data-t="Human detection module" data-d="The DFRobot C4001 is a 24 GHz mmWave radar sensor. It detects both moving and still people (walking, sitting or sleeping), up to 8 m for presence, and reports to the ESP32 over UART."><rect x="30" y="30" width="240" height="60" rx="10"/><text x="150" y="56">Human detection module</text><text class="s" x="150" y="75">DFRobot C4001 mmWave radar</text></g>
+      <g class="node" tabindex="0" data-t="ESP32-CAM" data-d="The rover's vision system. Its OV2640 camera streams live video over Wi-Fi to the dashboard, so operators can see hazardous areas safely."><rect x="30" y="190" width="240" height="60" rx="10"/><text x="150" y="216">ESP32-CAM</text><text class="s" x="150" y="235">Live video over Wi-Fi</text></g>
+      <g class="node" tabindex="0" data-t="GPS module" data-d="The NEO-6M GPS gives latitude, longitude, satellites and altitude. It reaches the ESP32 over UART, so the position of a survivor can be passed to rescue teams."><rect x="30" y="350" width="240" height="60" rx="10"/><text x="150" y="376">GPS module</text><text class="s" x="150" y="395">NEO-6M, UART</text></g>
+      <g class="node y" tabindex="0" data-t="ESP32" data-d="The central controller. It reads the sensors, decides what to do, drives the motors and stepper, sounds the buzzer, serves the web page and talks to Blynk, using its built-in Wi-Fi."><rect x="340" y="180" width="230" height="80" rx="10"/><text x="455" y="216">ESP32</text><text class="s" x="455" y="236">Main controller</text></g>
+      <g class="node" tabindex="0" data-t="Web dashboard" data-d="Shows whether a human is detected and the GPS position, and works alongside the Blynk app, which has the drive buttons and sensor on/off switches."><rect x="640" y="30" width="240" height="60" rx="10"/><text x="760" y="56">Web dashboard</text><text class="s" x="760" y="75">Web page + Blynk app</text></g>
+      <g class="node" tabindex="0" data-t="DC motors" data-d="DC motors driven through the L298N motor driver from the 12 V battery. They give forward, reverse and turning movement, with adjustable speed."><rect x="640" y="190" width="240" height="60" rx="10"/><text x="760" y="216">DC motors</text><text class="s" x="760" y="235">via L298N driver</text></g>
+      <g class="node" tabindex="0" data-t="Stepper motor" data-d="A stepper motor driven through a ULN2003 driver rotates the camera left or right in precise steps."><rect x="640" y="350" width="240" height="60" rx="10"/><text x="760" y="376">Stepper motor</text><text class="s" x="760" y="395">camera rotation, ULN2003</text></g>
+    </svg>
+    <div class="info" id="info"><b>Hover or tap a block</b><span style="color:var(--muted)">to see what it does. Cyan dots are inputs, yellow dots are outputs.</span></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Circuit diagram</small>How it is wired</h2>
+  <button class="full" id="fullBtn" type="button">⤢ Full view</button>
+  <div class="circuit">
+    <div class="stage" id="stage">
+      <img id="cimg" src="../images/rescue-circuit.png" alt="Rescue Guardian circuit diagram showing the ESP32, ESP32-CAM, L298N driver with DC motors, stepper motor and driver, GPS module, human detection module, buzzer and 12 V battery" loading="lazy">
+        <div class="zone" tabindex="0" data-t="Motor driver (L298N)" data-d="The red L298N board drives the DC motors from the 12 V battery. The ESP32 sends it direction and PWM speed signals, and its built-in flyback diodes protect the circuit from motor voltage spikes." style="left:14.0%;top:19.2%;width:14.9%;height:16.2%"></div>
+        <div class="zone" tabindex="0" data-t="DC motors (left)" data-d="Left-side DC motors. Controlled through ENB, IN3 and IN4 on the L298N for forward, reverse and turning." style="left:2.3%;top:20.1%;width:9.9%;height:15.6%"></div>
+        <div class="zone" tabindex="0" data-t="DC motors (right)" data-d="Right-side DC motors. Controlled through ENA, IN1 and IN2 on the L298N." style="left:30.4%;top:21.8%;width:7.6%;height:15.3%"></div>
+        <div class="zone" tabindex="0" data-t="12 V battery" data-d="The main supply. It feeds the motor driver directly, and is stepped down to 5 V or 3.3 V for the ESP32 and sensors." style="left:7.6%;top:33.2%;width:4.9%;height:6.8%"></div>
+        <div class="zone" tabindex="0" data-t="Stepper motor and ULN2003 driver" data-d="The stepper rotates the camera. The ULN2003 board amplifies the ESP32's signals, because the ESP32 cannot supply enough current to drive the stepper directly." style="left:2.3%;top:45.1%;width:23.9%;height:16.5%"></div>
+        <div class="zone" tabindex="0" data-t="ESP32" data-d="The main controller (ESP32 WROVER). It reads the C4001 and GPS, drives the motors and stepper, sounds the buzzer, serves the web page and talks to Blynk." style="left:52.4%;top:31.5%;width:14.9%;height:25.5%"></div>
+        <div class="zone" tabindex="0" data-t="ESP32-CAM" data-d="The vision system. It streams live video over Wi-Fi to the dashboard and has a flash LED and snapshot option." style="left:52.4%;top:62.1%;width:11.4%;height:16.7%"></div>
+        <div class="zone" tabindex="0" data-t="DFRobot C4001 radar" data-d="A 24 GHz mmWave sensor that detects moving and still people, up to 8 m for presence. It talks to the ESP32 over UART." style="left:75.7%;top:12.8%;width:7.9%;height:9.7%"></div>
+        <div class="zone" tabindex="0" data-t="NEO-6M GPS module" data-d="A u-blox GPS receiver that sends location data to the ESP32 over UART at 9600 baud." style="left:87.8%;top:35.7%;width:10.6%;height:9.9%"></div>
+        <div class="zone" tabindex="0" data-t="Buzzer" data-d="Sounds an alert tone when the C4001 detects a person." style="left:78.7%;top:55.8%;width:6.8%;height:10.2%"></div>
+      <div class="lens" id="lens"></div>
+    </div>
+  </div>
+  <div class="info" id="cinfo"><b>Hover or tap a zone</b><span style="color:var(--muted)">to see what it does. Move the cursor over the diagram to magnify it, or use Full view to zoom and drag.</span></div>
+</section>
+
+<div class="viewer" id="viewer">
+  <div class="vbtns"><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zout" type="button" aria-label="Zoom out">−</button><button id="zreset" type="button">Reset</button><button id="vclose" type="button" aria-label="Close">✕</button></div>
+  <img id="vimg" src="../images/rescue-circuit.png" alt="Rescue Guardian circuit diagram, full view" draggable="false">
+</div>
+
+<section class="rv">
+  <h2><small>Pin connections</small>ESP32 wiring from the firmware</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Module</th><th>Signal</th><th>ESP32 GPIO</th></tr></thead>
+    <tbody>
+      <tr><td>L298N (right motors)</td><td>ENA, IN1, IN2</td><td>25, 26, 27</td></tr>
+      <tr><td>L298N (left motors)</td><td>ENB, IN3, IN4</td><td>14, 18, 19</td></tr>
+      <tr><td>Stepper driver (ULN2003)</td><td>IN1, IN2, IN3, IN4</td><td>32, 33, 21, 22</td></tr>
+      <tr><td>Buzzer</td><td>Positive</td><td>15</td></tr>
+      <tr><td>C4001 radar (UART)</td><td>RX, TX</td><td>34, 13</td></tr>
+      <tr><td>GPS NEO-6M (UART)</td><td>RX, TX</td><td>5, 4</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Several pins were reassigned during testing to remove pin conflicts, since the ESP32 has limited free GPIOs for this many modules.</p>
+
+  <p class="sub">Power and protection</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Part</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>12 V battery</td><td>Powers the L298N motor driver directly</td></tr>
+      <tr><td>Regulator / buck converter</td><td>Steps 12 V down to 5 V or 3.3 V for the ESP32 and sensors</td></tr>
+      <tr><td>L298N flyback diodes</td><td>Absorb voltage spikes from the motors</td></tr>
+      <tr><td>Capacitors, resistors, battery management</td><td>Protect against electrical faults and extend reliability</td></tr>
+      <tr><td>Common ground</td><td>Gives every module the same reference voltage</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="rv">
+  <h2><small>Features</small>What the rover can do</h2>
+  <div class="chips">
+    <div class="grp"><h3>Human detection</h3><ul><li>24 GHz mmWave radar, no complex AI needed</li><li>Detects moving and still people</li><li>Presence up to 8 m, about 100° view</li></ul></div>
+    <div class="grp"><h3>Live video</h3><ul><li>ESP32-CAM streams over Wi-Fi</li><li>Snapshot and flash LED controls</li><li>Stepper rotates the camera</li></ul></div>
+    <div class="grp"><h3>Location tracking</h3><ul><li>Latitude, longitude, satellites, altitude</li><li>Shown on the web page</li><li>Sent to Blynk when a person is detected</li></ul></div>
+    <div class="grp"><h3>Remote control</h3><ul><li>Blynk buttons for all directions</li><li>Speed slider</li><li>Sensor on/off switches</li></ul></div>
+    <div class="grp"><h3>Alert system</h3><ul><li>Buzzer tone when a person is detected</li><li>Immediate audio feedback</li></ul></div>
+    <div class="grp"><h3>Modular design</h3><ul><li>Detection, video, GPS and buzzer work independently</li><li>Makes the most of limited ESP32 GPIOs</li></ul></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Dashboards</small>Control and monitoring</h2>
+  <p class="sub" style="margin-top:0">Blynk app controls</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Control</th><th>Virtual pin</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td>Forward / Reverse</td><td>V1 / V2</td><td>Drive straight</td></tr>
+      <tr><td>Forward right / left</td><td>V3 / V4</td><td>Turn while moving forward</td></tr>
+      <tr><td>Reverse right / left</td><td>V5 / V6</td><td>Turn while reversing</td></tr>
+      <tr><td>Stop</td><td>V7</td><td>Stop both sides</td></tr>
+      <tr><td>Speed slider</td><td>V8</td><td>Set motor speed</td></tr>
+      <tr><td>Camera rotate</td><td>V9</td><td>Stepper left, right or stop</td></tr>
+      <tr><td>C4001 on / off</td><td>V10 / V11</td><td>Enable or disable the sensor</td></tr>
+      <tr><td>Location</td><td>V12 / V13</td><td>Latitude and longitude sent when a person is detected</td></tr>
+    </tbody>
+  </table></div>
+  <p class="sub">Web interface</p>
+  <p>The ESP32 hosts a web page on the local network that refreshes every second. It shows whether a human is detected, not detected or the sensor is off, along with the GPS position, and also gives the same data as JSON at <code>/status</code>. The ESP32-CAM serves its own page with the live stream, a snapshot link and a flash switch.</p>
+</section>
+
+<section class="rv">
+  <h2><small>Results</small>What we found</h2>
+  <ul class="plain">
+    <li>The C4001 reliably detected human presence in controlled environments, and every detection triggered the buzzer.</li>
+    <li>Live video reached the dashboard and stayed stable on a strong Wi-Fi signal, with small delays on weak signals.</li>
+    <li>GPS coordinates were accurate and shown on the dashboard.</li>
+    <li>The rover moved smoothly forward, backward, left and right, on flat and slightly uneven ground.</li>
+    <li>Switching modules on and off from the dashboard worked as intended.</li>
+    <li>Proteus simulation matched real-world behaviour, which reduced debugging time.</li>
+  </ul>
+</section>
+
+<section class="rv">
+  <h2><small>Challenges</small>Problems we solved</h2>
+  <div class="chips">
+    <div class="grp"><h3>Limited GPIOs</h3><ul><li>Many modules, few free ESP32 pins</li><li>Solved with careful pin assignment and modular design</li></ul></div>
+    <div class="grp"><h3>Pin conflicts</h3><ul><li>Some pins clashed between modules</li><li>Moved the C4001 and GPS to safe pins</li></ul></div>
+    <div class="grp"><h3>Wi-Fi stability</h3><ul><li>Video needs a steady connection</li><li>Improved with optimized code and max Wi-Fi transmit power</li></ul></div>
+    <div class="grp"><h3>Upload errors</h3><ul><li>ESP32 upload failures during integration</li><li>Fixed with repeated hardware testing</li></ul></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Components</small>Hardware and software</h2>
+  <div class="chips">
+    <div class="grp"><h3>Compute and vision</h3><ul><li>ESP32 WROVER: dual-core 240 MHz, Wi-Fi + Bluetooth, 4 MB flash, 8 MB PSRAM</li><li>ESP32-CAM: OV2640 2 MP camera, microSD slot, flash LED</li></ul></div>
+    <div class="grp"><h3>Sensing</h3><ul><li>DFRobot C4001 24 GHz mmWave presence sensor (UART / I²C)</li><li>u-blox NEO-6M GPS module (UART, 9600 baud)</li></ul></div>
+    <div class="grp"><h3>Drive</h3><ul><li>L298N motor driver</li><li>DC motors with wheels</li><li>Stepper motor with ULN2003 driver</li></ul></div>
+    <div class="grp"><h3>Alert and power</h3><ul><li>Buzzer</li><li>12 V battery</li><li>Regulator, capacitors, resistors and battery management</li></ul></div>
+    <div class="grp"><h3>Software</h3><ul><li>Arduino IDE, embedded C++</li><li>Proteus for simulation</li><li>Blynk and a web dashboard</li><li>AccelStepper, TinyGPS++, WebServer and camera libraries</li></ul></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>What's next</small>Future scope</h2>
+  <ul class="plain">
+    <li>Better navigation for tougher disaster terrain.</li>
+    <li>Stronger communication modules for steadier video in the field.</li>
+    <li>Extra sensors for environmental monitoring.</li>
+  </ul>
+</section>
+
+<section class="rv" style="padding-top:0">
+  <a class="back" href="../index.html#projects">← Back to projects</a>
+</section>
+
+<footer>© 2026 Harikrishnan M</footer>
+
+<script>
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+/* sound switch (same setting as the main site) */
+let muted=false; try{muted=localStorage.getItem('hm-muted')==='1'}catch(e){}
+const mb=document.getElementById('muteBtn');
+function setMuted(m){muted=m;mb.textContent=m?'🔇':'🔊';mb.title=m?'Sound off':'Sound on';try{localStorage.setItem('hm-muted',m?'1':'0')}catch(e){}}
+setMuted(muted); mb.onclick=()=>setMuted(!muted);
+let last=0;
+function blip(rate){const n=Date.now(); if(muted||n-last<120) return; last=n;
+  const a=new Audio('../audio/scan.mp3'); a.volume=.35; a.preservesPitch=false; a.webkitPreservesPitch=false; a.playbackRate=rate; a.play().catch(()=>{})}
+
+/* video placeholder */
+const src=document.querySelector('#demo source');
+src.addEventListener('error',()=>{document.getElementById('demo').style.display='none';document.getElementById('noVideo').style.display='flex'});
+
+/* block diagram: hover / focus / tap shows what each block does */
+const info=document.getElementById('info'), nodes=[...document.querySelectorAll('.node')];
+nodes.forEach((n,i)=>{
+  const show=()=>{nodes.forEach(x=>x.classList.remove('on'));n.classList.add('on');
+    info.innerHTML='<b></b><span style="color:var(--muted)"></span>';
+    info.firstChild.textContent=n.dataset.t; info.lastChild.textContent=n.dataset.d; blip(0.9+i*0.05)};
+  n.addEventListener('pointerenter',show); n.addEventListener('focus',show); n.addEventListener('click',show);
+});
+/* rising glow particles in the hero */
+if(!still){const h=document.querySelector('.hero');
+  for(let i=0;i<14;i++){const b=document.createElement('i');b.className='bub';const s=6+Math.random()*18;
+    b.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;animation-duration:${8+Math.random()*10}s;animation-delay:${-Math.random()*12}s`;h.appendChild(b)}}
+else document.querySelectorAll('circle animateMotion').forEach(a=>a.parentNode.remove());
+/* scan sound on stats, table rows and component cards */
+document.querySelectorAll('.stat,tbody tr,.grp').forEach((el,i)=>el.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')blip(.8+(i%7)*.08)}));
+
+/* circuit diagram: magnifier lens, zone highlights, full view */
+const stage=document.getElementById('stage'), lens=document.getElementById('lens'), cimg=document.getElementById('cimg'), cinfo=document.getElementById('cinfo');
+const ZOOM=2.6, R=85;
+stage.addEventListener('pointerenter',e=>{ if(e.pointerType==='mouse'){lens.classList.add('show');blip(1.25)} });
+stage.addEventListener('pointerleave',e=>{ lens.classList.remove('show'); if(e.pointerType==='mouse') zones.forEach(o=>o.classList.remove('on')) });
+stage.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse') return;
+  const r=stage.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
+  lens.style.left=(x-R)+'px'; lens.style.top=(y-R)+'px';
+  lens.style.backgroundImage='url("'+(cimg.currentSrc||cimg.src)+'")';
+  lens.style.backgroundSize=(r.width*ZOOM)+'px '+(r.height*ZOOM)+'px';
+  lens.style.backgroundPosition=(R-x*ZOOM)+'px '+(R-y*ZOOM)+'px';
+});
+const zones=[...document.querySelectorAll('.zone')];
+zones.forEach((z,i)=>{
+  const show=()=>{zones.forEach(o=>o.classList.remove('on')); z.classList.add('on');
+    cinfo.innerHTML='<b></b><span style="color:var(--muted)"></span>'; cinfo.firstChild.textContent=z.dataset.t; cinfo.lastChild.textContent=z.dataset.d; blip(.85+i*.08)};
+  z.addEventListener('pointerenter',show); z.addEventListener('focus',show); z.addEventListener('click',show);
+});
+const viewer=document.getElementById('viewer'), vimg=document.getElementById('vimg');
+let sc=1,tx=0,ty=0,drag=null;
+const apply=()=>{vimg.style.transform='translate('+tx+'px,'+ty+'px) scale('+sc+')'};
+function fit(){
+  const nw=cimg.naturalWidth||1408, nh=cimg.naturalHeight||768;
+  const w=Math.min(innerWidth*.96,innerHeight*.9*nw/nh), h=w*nh/nw;
+  vimg.style.width=w+'px'; vimg.style.height=h+'px'; sc=1; tx=(innerWidth-w)/2; ty=(innerHeight-h)/2; apply();
+}
+function zoomAt(f,cx,cy){const ns=Math.min(6,Math.max(1,sc*f)); if(ns===1) return fit(); const k=ns/sc; tx=cx-(cx-tx)*k; ty=cy-(cy-ty)*k; sc=ns; apply()}
+function openV(){viewer.classList.add('open'); document.body.style.overflow='hidden'; fit(); blip(.7)}
+function closeV(){viewer.classList.remove('open'); document.body.style.overflow=''; blip(1.4)}
+document.getElementById('fullBtn').onclick=openV;
+document.getElementById('vclose').onclick=closeV;
+document.getElementById('zin').onclick=()=>zoomAt(1.4,innerWidth/2,innerHeight/2);
+document.getElementById('zout').onclick=()=>zoomAt(1/1.4,innerWidth/2,innerHeight/2);
+document.getElementById('zreset').onclick=fit;
+addEventListener('keydown',e=>{ if(e.key==='Escape'&&viewer.classList.contains('open')) closeV() });
+addEventListener('resize',()=>{ if(viewer.classList.contains('open')) fit() });
+viewer.addEventListener('wheel',e=>{e.preventDefault(); zoomAt(e.deltaY<0?1.2:1/1.2,e.clientX,e.clientY)},{passive:false});
+vimg.addEventListener('pointerdown',e=>{drag={x:e.clientX-tx,y:e.clientY-ty}; vimg.setPointerCapture(e.pointerId); viewer.style.cursor='grabbing'});
+vimg.addEventListener('pointermove',e=>{if(!drag) return; tx=e.clientX-drag.x; ty=e.clientY-drag.y; apply()});
+const endDrag=()=>{drag=null; viewer.style.cursor='grab'};
+vimg.addEventListener('pointerup',endDrag); vimg.addEventListener('pointercancel',endDrag);
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

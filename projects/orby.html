@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ORBY | Desktop Pet | Harikrishnan M</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#050816;--panel:#0b1230;--blue:#2350ff;--sky:#6f93ff;--cyan:#4de1ff;--cream:#ece6d8;--teal:#19b5b0;--text:#e8ecff;--muted:#9aa4d0;--line:#16205a}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--text);font-family:'Archivo',system-ui,sans-serif;line-height:1.65;overflow-x:hidden}
+a{color:inherit}
+section{padding:80px 6vw;max-width:1200px;margin:0 auto}
+h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;font-stretch:110%;line-height:1.05;margin-bottom:28px}
+h2 small{display:block;font:500 .85rem 'Space Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--sky);margin-bottom:10px}
+p{color:var(--muted);max-width:70ch}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s,transform .9s}.rv.in{opacity:1;transform:none}
+
+/* top bar */
+.bar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:16px 6vw;background:linear-gradient(var(--ink),transparent)}
+.bar a{text-decoration:none;color:var(--muted);font-size:.95rem}.bar a:hover,.bar button:hover{color:#fff}
+.bar button{background:none;border:0;color:var(--muted);font-size:1rem;cursor:pointer}
+a:focus-visible,button:focus-visible,.node:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+
+/* hero */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 6vw 90px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 100%,#1a3cff 0%,#0a1650 45%,var(--ink) 85%)}
+.hero .in-wrap{position:relative;z-index:2;max-width:1200px;margin:0 auto;width:100%}
+.hero .tagline{font:500 1rem 'Space Grotesk',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan)}
+.hero h1{font-size:clamp(3.2rem,12vw,10rem);font-weight:900;font-stretch:125%;line-height:.95;color:#fff;margin:10px 0 18px}
+.hero p{font-size:1.15rem}
+.title{position:relative;display:inline-block;letter-spacing:.01em}
+.title span{display:inline-block}
+.title .o{color:transparent;-webkit-text-stroke:2px var(--cyan);text-shadow:0 0 28px rgba(77,225,255,.45)}
+.title .f{background:linear-gradient(180deg,#fff 10%,var(--cyan) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(35,80,255,.9))}
+.title::after{content:"";position:absolute;top:0;bottom:0;left:-30%;width:22%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);mix-blend-mode:overlay;animation:sweep 2.4s .5s ease-out 1 both;pointer-events:none}
+@keyframes sweep{from{left:-30%}to{left:115%}}
+.title-bar{display:block;width:min(420px,60%);height:6px;margin:6px 0 22px;border-radius:3px;background:repeating-linear-gradient(-45deg,var(--cyan) 0 10px,var(--blue) 10px 20px)}
+.bub{position:absolute;bottom:-30px;border-radius:50%;border:1px solid rgba(143,176,255,.45);animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-110vh) translateX(20px);opacity:0}}
+.video{margin-top:36px;border:1px solid rgba(111,147,255,.4);border-radius:16px;overflow:hidden;background:#071040;aspect-ratio:16/9;max-width:900px}
+.video video{width:100%;height:100%;display:block;background:#000}
+.video .empty{height:100%;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.stat{background:var(--panel);border:1px solid var(--line);padding:22px;clip-path:polygon(0 0,88% 0,100% 16%,100% 100%,0 100%)}
+.stat b{display:block;font-size:2.2rem;font-weight:800;color:var(--cyan);line-height:1.1}
+.stat span{color:var(--muted);font-size:.95rem}
+ul.plain{list-style:none;display:grid;gap:12px;max-width:80ch}
+ul.plain li{padding-left:22px;position:relative;color:var(--muted)}
+ul.plain li::before{content:"";position:absolute;left:0;top:.7em;width:8px;height:8px;background:var(--blue);border-radius:2px}
+
+/* block diagram */
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;overflow-x:auto}
+.diagram svg{display:block;min-width:640px;width:100%;height:auto}
+.node rect{fill:#141f55;stroke:var(--sky);stroke-width:1.5;transition:.2s}
+.node.y rect{fill:#3a3410;stroke:#e6c84a}
+.node.r rect{fill:#1d2f80;stroke:var(--cyan)}
+.node text{fill:#e8ecff;font:600 13px 'Space Grotesk',sans-serif;text-anchor:middle;pointer-events:none}
+.node text.s{font-weight:500;font-size:11.5px;fill:#b9c4ef}
+.node{cursor:pointer;outline:none}
+.node:hover rect,.node:focus rect,.node.on rect{fill:var(--blue);stroke:var(--cyan)}
+.ln{stroke:#8da2e8;stroke-width:1.6;fill:none}
+.lbl{fill:#8da2e8;font:500 11px 'Space Grotesk',sans-serif;text-anchor:middle}
+.info{margin-top:16px;padding:18px 20px;border-left:4px solid var(--cyan);background:#0a1240;border-radius:4px 12px 12px 4px;min-height:96px}
+.info b{display:block;color:#fff;margin-bottom:4px;font-size:1.05rem}
+
+/* tables */
+.tbl{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow-x:auto;max-width:900px}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{text-align:left;padding:12px 18px;border-bottom:1px solid var(--line);color:var(--muted);white-space:nowrap}
+th{color:var(--cyan);font:700 .9rem 'Space Grotesk',sans-serif}
+td:first-child{color:#fff;font-weight:600}
+tr:last-child td{border-bottom:0}
+.sub{margin:34px 0 12px;font:700 1.1rem 'Space Grotesk',sans-serif;color:#fff}
+.note{margin-top:14px;font-size:.9rem}
+
+/* components */
+.chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.grp{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.grp h3{font:700 1rem 'Space Grotesk',sans-serif;color:var(--cyan);margin-bottom:8px}
+.grp li{list-style:none;color:var(--muted);font-size:.95rem;padding:3px 0}
+
+/* back link */
+.back{display:inline-block;margin-top:28px;padding:14px 26px;border:2px solid var(--blue);border-radius:999px;font-weight:700;text-decoration:none;transition:.2s}
+.back:hover{background:var(--blue)}
+footer{padding:28px 6vw;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
+@media(prefers-reduced-motion:reduce){.title::after{display:none}.bub{display:none}.rv{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+
+.eyes{display:flex;gap:18px;padding:16px 24px;background:#02050f;border:1px solid rgba(111,147,255,.4);border-radius:14px;width:max-content;margin:6px 0 22px;box-shadow:0 0 30px rgba(35,80,255,.35)}
+.eyes i{display:block;width:34px;height:40px;background:var(--cyan);border-radius:10px;box-shadow:0 0 16px var(--cyan);animation:blink 5s infinite}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+@media(prefers-reduced-motion:reduce){.eyes i{animation:none}}
+</style>
+</head>
+<body>
+
+<div class="bar"><a href="../index.html#projects">← Back to projects</a><button id="muteBtn" type="button" aria-label="Turn sound on or off" title="Sound on">🔊</button></div>
+
+<header class="hero">
+  <div class="in-wrap">
+    <p class="tagline">Desktop pet · Phone controlled</p>
+    <h1 class="title" aria-label="Orby"><span class="o" aria-hidden="true">OR</span><span class="f" aria-hidden="true">BY</span></h1>
+    <div class="eyes" aria-hidden="true"><i></i><i></i></div>
+    <p>A small desktop pet with animated OLED eyes. It shows the time and day, reacts to touch, and you change its eye mode from your phone over Wi-Fi.</p>
+    <!-- Put your animated video at videos/orby.mp4 (the page shows a placeholder until it exists) -->
+    <div class="video">
+      <video id="demo" controls playsinline preload="metadata"><source src="../videos/orby.mp4" type="video/mp4"></video>
+      <div class="empty" id="noVideo" style="display:none">Animated video goes here<br>(videos/orby.mp4)</div>
+    </div>
+  </div>
+</header>
+
+<section class="rv">
+  <h2><small>Overview</small>What Orby does</h2>
+  <p style="margin-bottom:26px">Orby sits on your desk and keeps you company. An ESP8266 (Wemos D1 Mini) draws expressive eyes on a small OLED screen and also shows the clock and the day. Orby hosts a web page, so you connect your phone over Wi-Fi, open the page and switch the eye mode. A touch sensor lets you interact with it by hand, and a rechargeable battery with a USB-C charger makes it cable-free.</p>
+  <div class="stats">
+    <div class="stat"><b>OLED</b><span>animated eyes, clock and day</span></div>
+    <div class="stat"><b>Wi-Fi</b><span>eye mode controlled from your phone</span></div>
+    <div class="stat"><b>Touch</b><span>tap sensor for hands-on interaction</span></div>
+    <div class="stat"><b>800 mAh</b><span>Li-ion battery, USB-C charging</span></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Objectives</small>What we set out to build</h2>
+  <ul class="plain">
+    <li>Build a small, friendly desktop pet with lively animated eyes on an OLED display.</li>
+    <li>Control Orby's eye mode from a phone through a web page hosted by the ESP8266.</li>
+    <li>Show the clock time and day on the display, so Orby is useful as well as fun.</li>
+    <li>Add a touch sensor so Orby responds when you touch it.</li>
+    <li>Make it portable with a rechargeable Li-ion battery and a USB-C charging module.</li>
+  </ul>
+</section>
+
+<section class="rv">
+  <h2><small>Block diagram</small>How the system works</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 910 400" role="img" aria-label="Orby system: phone to Wemos D1 Mini over Wi-Fi, OLED over I2C, touch sensor input, battery and TP4056 power">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8da2e8"/></marker></defs>
+      <g class="ln" marker-end="url(#ar)">
+        <path d="M250 60H345"/><path d="M565 60H640"/>
+        <path d="M640 230H520V92"/>
+        <path d="M250 350H345"/><path d="M380 320V92"/>
+      </g>
+      <text class="lbl" x="297" y="50">Wi-Fi</text>
+      <text class="lbl" x="602" y="50">I²C</text>
+      <text class="lbl" x="580" y="222">touch signal</text>
+      <text class="lbl" x="297" y="340">charge</text>
+      <text class="lbl" x="350" y="205" text-anchor="end">5V</text>
+      <circle r="4.5" fill="#4de1ff"><animateMotion dur="5s" repeatCount="indefinite" path="M250 60H640"/></circle>
+      <circle r="4.5" fill="#4de1ff"><animateMotion dur="4s" repeatCount="indefinite" path="M640 230H520V92"/></circle>
+      <circle r="4.5" fill="#e6c84a"><animateMotion dur="5s" repeatCount="indefinite" path="M250 350H380V92"/></circle>
+
+      <g class="node" tabindex="0" data-t="Mobile phone" data-d="Connects to Orby over Wi-Fi and opens the control web page, where you pick the eye mode."><rect x="30" y="30" width="220" height="60" rx="10"/><text x="140" y="56">Mobile phone</text><text class="s" x="140" y="75">Web page controls</text></g>
+      <g class="node y" tabindex="0" data-t="Wemos D1 Mini (ESP8266)" data-d="The brain of Orby. It hosts the control web page, reads the touch sensor, keeps the clock, and draws the eyes and the time on the OLED."><rect x="345" y="30" width="220" height="60" rx="10"/><text x="455" y="56">Wemos D1 Mini</text><text class="s" x="455" y="75">ESP8266 + web page</text></g>
+      <g class="node r" tabindex="0" data-t="OLED display" data-d="Shows Orby's animated eyes, the clock time and the day. It connects over I²C: SCL to D1 (GPIO5) and SDA to D2 (GPIO4)."><rect x="640" y="30" width="260" height="60" rx="10"/><text x="770" y="56">OLED display</text><text class="s" x="770" y="75">Eyes, clock and day</text></g>
+      <g class="node" tabindex="0" data-t="Touch sensor" data-d="Lets you interact with Orby by touch. Its signal pin goes to D3 (GPIO0) and it runs from 3V3."><rect x="640" y="200" width="260" height="60" rx="10"/><text x="770" y="226">Touch sensor</text><text class="s" x="770" y="245">Signal to D3</text></g>
+      <g class="node" tabindex="0" data-t="Li-ion battery" data-d="A 3.7V 800mAh Li-ion battery that makes Orby wireless. It connects to the BAT+ and BAT− pins of the TP4056."><rect x="30" y="320" width="220" height="60" rx="10"/><text x="140" y="346">Li-ion battery</text><text class="s" x="140" y="365">3.7V 800mAh</text></g>
+      <g class="node y" tabindex="0" data-t="TP4056 charger" data-d="A USB-C charging module that charges the battery safely. Its OUT+ feeds the Wemos 5V/VIN pin and OUT− goes to GND."><rect x="345" y="320" width="220" height="60" rx="10"/><text x="455" y="346">TP4056 charger</text><text class="s" x="455" y="365">USB-C charging + output</text></g>
+    </svg>
+    <div class="info" id="info"><b>Hover or tap a block</b><span style="color:var(--muted)">to see what it does. The glowing dots show data and power flow.</span></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Pin diagram</small>How it is wired</h2>
+  <p class="sub" style="margin-top:0">OLED display to Wemos D1 Mini</p>
+  <div class="tbl"><table>
+    <thead><tr><th>OLED pin</th><th>Wemos D1 Mini</th></tr></thead>
+    <tbody>
+      <tr><td>VCC</td><td>3V3</td></tr>
+      <tr><td>GND</td><td>GND</td></tr>
+      <tr><td>SCL</td><td>D1 (GPIO5)</td></tr>
+      <tr><td>SDA</td><td>D2 (GPIO4)</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="sub">Touch sensor to Wemos D1 Mini</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Touch sensor pin</th><th>Wemos D1 Mini</th></tr></thead>
+    <tbody>
+      <tr><td>VCC</td><td>3V3</td></tr>
+      <tr><td>GND</td><td>GND</td></tr>
+      <tr><td>SIG</td><td>D3 (GPIO0)</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="sub">TP4056 charger, battery and power</p>
+  <div class="tbl"><table>
+    <thead><tr><th>TP4056 pin</th><th>Connects to</th></tr></thead>
+    <tbody>
+      <tr><td>BAT+ / BAT−</td><td>Li-ion battery (+) / (−)</td></tr>
+      <tr><td>OUT+</td><td>Wemos 5V / VIN</td></tr>
+      <tr><td>OUT−</td><td>Wemos GND</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">All parts share a common ground. The circuit is assembled on a perfboard / zero PCB with jumper wires.</p>
+</section>
+
+<section class="rv">
+  <h2><small>Components</small>Hardware and software</h2>
+  <div class="chips">
+    <div class="grp"><h3>Control</h3><ul><li>Wemos D1 Mini (ESP8266)</li><li>Web page hosted on the board</li><li>Phone as the remote</li></ul></div>
+    <div class="grp"><h3>Display and input</h3><ul><li>OLED display (I²C)</li><li>Touch sensor</li></ul></div>
+    <div class="grp"><h3>Power</h3><ul><li>3.7V 800mAh Li-ion battery</li><li>TP4056 USB-C charging module</li></ul></div>
+    <div class="grp"><h3>Build</h3><ul><li>Perfboard / zero PCB</li><li>Jumper wires</li><li>Desktop enclosure</li></ul></div>
+  </div>
+</section>
+
+<section class="rv" style="padding-top:0">
+  <a class="back" href="../index.html#projects">← Back to projects</a>
+</section>
+
+<footer>© 2026 Harikrishnan M</footer>
+
+<script>
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+/* sound switch (same setting as the main site) */
+let muted=false; try{muted=localStorage.getItem('hm-muted')==='1'}catch(e){}
+const mb=document.getElementById('muteBtn');
+function setMuted(m){muted=m;mb.textContent=m?'🔇':'🔊';mb.title=m?'Sound off':'Sound on';try{localStorage.setItem('hm-muted',m?'1':'0')}catch(e){}}
+setMuted(muted); mb.onclick=()=>setMuted(!muted);
+let last=0;
+function blip(rate){const n=Date.now(); if(muted||n-last<120) return; last=n;
+  const a=new Audio('../audio/scan.mp3'); a.volume=.35; a.preservesPitch=false; a.webkitPreservesPitch=false; a.playbackRate=rate; a.play().catch(()=>{})}
+
+/* video placeholder */
+const src=document.querySelector('#demo source');
+src.addEventListener('error',()=>{document.getElementById('demo').style.display='none';document.getElementById('noVideo').style.display='flex'});
+
+/* block diagram: hover / focus / tap shows what each block does */
+const info=document.getElementById('info'), nodes=[...document.querySelectorAll('.node')];
+nodes.forEach((n,i)=>{
+  const show=()=>{nodes.forEach(x=>x.classList.remove('on'));n.classList.add('on');
+    info.innerHTML='<b></b><span style="color:var(--muted)"></span>';
+    info.firstChild.textContent=n.dataset.t; info.lastChild.textContent=n.dataset.d; blip(0.9+i*0.05)};
+  n.addEventListener('pointerenter',show); n.addEventListener('focus',show); n.addEventListener('click',show);
+});
+/* rising glow particles in the hero */
+if(!still){const h=document.querySelector('.hero');
+  for(let i=0;i<14;i++){const b=document.createElement('i');b.className='bub';const s=6+Math.random()*18;
+    b.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;animation-duration:${8+Math.random()*10}s;animation-delay:${-Math.random()*12}s`;h.appendChild(b)}}
+else document.querySelectorAll('circle animateMotion').forEach(a=>a.parentNode.remove());
+/* scan sound on stats, table rows and component cards */
+document.querySelectorAll('.stat,tbody tr,.grp').forEach((el,i)=>el.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')blip(.8+(i%7)*.08)}));
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
