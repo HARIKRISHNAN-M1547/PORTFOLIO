@@ -89,6 +89,7 @@ button.btn.playing{background:var(--blue);border-color:var(--blue)}
 .card:hover{transform:translateY(-8px)}
 /* 10. PROJECT REVEAL: same circle effect as the hero photo, showing the project picture */
 .card.proj{transition:opacity 1s,transform 1s,--r .3s ease}
+.card .stretch{position:absolute;inset:0;z-index:2}
 .card .reveal{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;z-index:1;
   -webkit-mask-image:radial-gradient(circle var(--r) at var(--x) var(--y),#000 96%,transparent 100%);
           mask-image:radial-gradient(circle var(--r) at var(--x) var(--y),#000 96%,transparent 100%)}
@@ -183,8 +184,8 @@ I'm driven by curiosity and a hands-on approach to learning, turning ideas into 
 <section id="projects">
   <h2 class="rv">What I've been<br>working on</h2>
   <div class="cards">
-    <article class="card proj c-blue rv"><img class="reveal" src="images/neptune.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><div><h3>NEPTUNE</h3><p>Underwater ROV, my B.Tech main project.</p></div><small>ROV · Control · Electronics</small></article>
-    <article class="card proj c-cream rv"><img class="reveal" src="images/mushroom.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><div><h3>MUSHROOM CULTIVATION SYSTEM</h3><p>Closed-loop control of humidity, ventilation and lighting.</p></div><small>Sensors · Automation</small></article>
+    <article class="card proj c-blue rv"><img class="reveal" src="images/neptune.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><a class="stretch" href="projects/neptune.html" aria-label="Open the NEPTUNE project page"></a><div><h3>NEPTUNE</h3><p>Underwater ROV, my B.Tech main project.</p></div><small>ROV · Control · Electronics<br>View details →</small></article>
+    <article class="card proj c-cream rv"><img class="reveal" src="images/mushroom.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><a class="stretch" href="projects/mushroom.html" aria-label="Open the Mushroom Cultivation System project page"></a><div><h3>AUTOMATED MUSHROOM CULTIVATION SYSTEM</h3><p>Closed-loop control of humidity, ventilation and lighting.</p></div><small>Sensors · Automation<br>View details →</small></article>
     <article class="card proj c-teal rv"><img class="reveal" src="images/rescue.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><div><h3>RESCUE GUARDIAN</h3><p>ESP32 rover with Blynk app and web dashboard.</p></div><small>ESP32 · Blynk · Web</small></article>
     <article class="card proj c-cream rv"><img class="reveal" src="images/battlebot.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><div><h3>BATTLE BOT</h3><p>Car controlled from a web page over its own Wi-Fi.</p></div><small>ESP8266 · L298N</small></article>
     <article class="card proj c-blue rv"><img class="reveal" src="images/orby.png" alt="" aria-hidden="true" onerror="this.style.display='none'"><div><h3>ORBY</h3><p>Interactive desktop eyes, controlled from a phone.</p></div><small>ESP8266 · OLED</small></article>

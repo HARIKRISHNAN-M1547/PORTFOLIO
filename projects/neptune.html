@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEPTUNE | Underwater ROV | Harikrishnan M</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#050816;--panel:#0b1230;--blue:#2350ff;--sky:#6f93ff;--cyan:#4de1ff;--cream:#ece6d8;--teal:#19b5b0;--text:#e8ecff;--muted:#9aa4d0}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--text);font-family:'Archivo',system-ui,sans-serif;line-height:1.65;overflow-x:hidden}
+a{color:inherit}
+section{padding:80px 6vw;max-width:1200px;margin:0 auto}
+h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;font-stretch:110%;line-height:1.05;margin-bottom:28px}
+h2 small{display:block;font:500 .85rem 'Space Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--sky);margin-bottom:10px}
+p{color:var(--muted);max-width:70ch}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s,transform .9s}.rv.in{opacity:1;transform:none}
+
+/* top bar */
+.bar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:16px 6vw;background:linear-gradient(var(--ink),transparent)}
+.bar a{text-decoration:none;color:var(--muted);font-size:.95rem}.bar a:hover,.bar button:hover{color:#fff}
+.bar button{background:none;border:0;color:var(--muted);font-size:1rem;cursor:pointer}
+
+/* hero */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 6vw 60px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 100%,#1a3cff 0%,#0a1650 45%,var(--ink) 85%)}
+.hero .in-wrap{position:relative;z-index:2;max-width:1200px;margin:0 auto;width:100%}
+.hero .tagline{font:500 1rem 'Space Grotesk',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan)}
+.hero h1{font-size:clamp(3.5rem,13vw,11rem);font-weight:900;font-stretch:125%;line-height:.95;color:#fff;margin:10px 0 18px}
+.hero p{font-size:1.15rem}
+.bub{position:absolute;bottom:-30px;border-radius:50%;border:1px solid rgba(143,176,255,.45);animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-110vh) translateX(20px);opacity:0}}
+.video{margin-top:36px;border:1px solid rgba(111,147,255,.4);border-radius:16px;overflow:hidden;background:#071040;aspect-ratio:16/9;max-width:900px}
+.video video{width:100%;height:100%;display:block;background:#000}
+.video .empty{height:100%;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.stat{background:var(--panel);border:1px solid #16205a;padding:22px;clip-path:polygon(0 0,88% 0,100% 16%,100% 100%,0 100%)}
+.stat b{display:block;font-size:2.2rem;font-weight:800;color:var(--cyan);line-height:1.1}
+.stat span{color:var(--muted);font-size:.95rem}
+ul.plain{list-style:none;display:grid;gap:12px;max-width:80ch}
+ul.plain li{padding-left:22px;position:relative;color:var(--muted)}
+ul.plain li::before{content:"";position:absolute;left:0;top:.7em;width:8px;height:8px;background:var(--blue);border-radius:2px}
+
+/* block diagram */
+.diagram{background:var(--panel);border:1px solid #16205a;border-radius:16px;padding:16px;overflow-x:auto}
+.diagram svg{display:block;min-width:640px;width:100%;height:auto}
+.node rect{fill:#141f55;stroke:var(--sky);stroke-width:1.5;transition:.2s}
+.node.y rect{fill:#3a3410;stroke:#e6c84a}
+.node text{fill:#e8ecff;font:600 13px 'Space Grotesk',sans-serif;text-anchor:middle;pointer-events:none}
+.node text.s{font-weight:500;font-size:11.5px;fill:#b9c4ef}
+.node{cursor:pointer;outline:none}
+.node:hover rect,.node:focus rect,.node.on rect{fill:var(--blue);stroke:var(--cyan)}
+.ln{stroke:#8da2e8;stroke-width:1.6;fill:none}.fb{stroke-dasharray:6 5}
+.info{margin-top:16px;padding:18px 20px;border-left:4px solid var(--cyan);background:#0a1240;border-radius:4px 12px 12px 4px;min-height:96px}
+.info b{display:block;color:#fff;margin-bottom:4px;font-size:1.05rem}
+.hint{font-size:.9rem;margin-top:10px}
+
+/* architecture */
+.arch{display:grid;gap:14px;max-width:900px}
+.box{border-radius:14px;padding:18px 20px}
+.box h3{font-size:1.05rem;margin-bottom:8px}
+.box ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.box li{background:rgba(255,255,255,.1);padding:5px 12px;border-radius:999px;font-size:.9rem}
+.lap{background:#17307f}.link{background:#1c1c24;text-align:center;color:var(--muted);padding:10px;border-radius:10px;font-size:.95rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.pi{background:#14502a}.esp{background:#6a3a12}
+
+/* components */
+.chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.grp{background:var(--panel);border:1px solid #16205a;border-radius:14px;padding:18px 20px}
+.grp h3{font:700 1rem 'Space Grotesk',sans-serif;color:var(--cyan);margin-bottom:8px}
+.grp li{list-style:none;color:var(--muted);font-size:.95rem;padding:3px 0}
+.circuit{position:relative;background:#fff;border-radius:14px;padding:8px}
+.stage{position:relative;cursor:crosshair}
+.stage img{width:100%;display:block;border-radius:8px}
+.zone{position:absolute;border:2px solid transparent;border-radius:12px;transition:.2s;outline:none}
+.zone:hover,.zone:focus,.zone.on{border-color:#0a8fb0;background:rgba(77,225,255,.16);box-shadow:0 0 0 2px rgba(77,225,255,.4),0 0 24px rgba(77,225,255,.5)}
+.lens{position:absolute;z-index:3;width:170px;height:170px;border-radius:50%;border:3px solid var(--cyan);pointer-events:none;opacity:0;transition:opacity .15s;
+  background-color:#fff;background-repeat:no-repeat;background-origin:border-box;box-shadow:0 8px 30px rgba(0,0,0,.5),0 0 20px rgba(77,225,255,.6)}
+.lens.show{opacity:1}
+.full{display:block;margin:0 0 12px auto;background:rgba(5,8,22,.85);color:#fff;border:1px solid var(--sky);border-radius:999px;padding:8px 16px;font:600 .85rem 'Space Grotesk',sans-serif;cursor:pointer}
+.full:hover{background:var(--blue)}
+.viewer{display:none;position:fixed;inset:0;z-index:100;background:#050816;overflow:hidden;touch-action:none;cursor:grab}
+.viewer.open{display:block}
+.viewer img{position:absolute;left:0;top:0;max-width:none;transform-origin:0 0;user-select:none;-webkit-user-drag:none;background:#fff;border-radius:6px}
+.vbtns{position:fixed;top:14px;right:14px;z-index:101;display:flex;gap:8px}
+.vbtns button{background:var(--panel);color:#fff;border:1px solid var(--sky);border-radius:999px;min-width:42px;height:42px;padding:0 14px;font:600 1rem 'Space Grotesk',sans-serif;cursor:pointer}
+.vbtns button:hover{background:var(--blue)}
+
+/* back link */
+.refs li{margin-bottom:8px}
+.back{display:inline-block;margin-top:28px;padding:14px 26px;border:2px solid var(--blue);border-radius:999px;font-weight:700;text-decoration:none;transition:.2s}
+.back:hover{background:var(--blue)}
+footer{padding:28px 6vw;color:var(--muted);font-size:.9rem;border-top:1px solid #16205a}
+@media(max-width:700px){.two{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.bub{display:none}.rv{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="bar"><a href="../index.html#projects">← Back to projects</a><button id="muteBtn" type="button" aria-label="Turn sound on or off" title="Sound on">🔊</button></div>
+
+<header class="hero">
+  <div class="in-wrap">
+    <p class="tagline">B.Tech Main Project · SUB_V1</p>
+    <h1>NEPTUNE</h1>
+    <p>A cost-effective, multi-sensor underwater ROV for structural dam inspection in GPS-denied environments.</p>
+    <!-- Put your animated video at videos/neptune.mp4 (the page shows a placeholder until it exists) -->
+    <div class="video">
+      <video id="demo" controls playsinline preload="metadata"><source src="../videos/neptune.mp4" type="video/mp4"></video>
+      <div class="empty" id="noVideo" style="display:none">Animated video goes here<br>(videos/neptune.mp4)</div>
+    </div>
+  </div>
+</header>
+
+<section class="rv">
+  <h2><small>Overview</small>What NEPTUNE does</h2>
+  <p style="margin-bottom:26px">NEPTUNE (SUB_V1) is designed to inspect dams without putting divers at risk. A dual-compute controller drives the thrusters and sensors, while a laptop control station shows the live camera feed, sensor data and defect detections.</p>
+  <div class="stats">
+    <div class="stat"><b>2</b><span>compute units: Raspberry Pi 5 + ESP32-S3</span></div>
+    <div class="stat"><b>100 Hz</b><span>real-time control loop</span></div>
+    <div class="stat"><b>4</b><span>thrusters for surge, yaw, heave and pitch</span></div>
+    <div class="stat"><b>12 V · 18 Ah</b><span>battery power system</span></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Objectives</small>What we set out to build</h2>
+  <ul class="plain">
+    <li>Design a cost-effective, multi-sensor underwater ROV for structural dam inspection in GPS-denied environments.</li>
+    <li>Use a dual-compute architecture: Raspberry Pi 5 (ROS 2) for high-level work and ESP32-S3 (FreeRTOS) for real-time control.</li>
+    <li>Generate real-time, mathematically scaled 3D structural maps with Visual-Inertial SLAM (VI-SLAM).</li>
+    <li>Combine optical, acoustic and pressure sensors for precise navigation and scale-drift correction.</li>
+    <li>Measure water quality (pH, ORP, TDS, turbidity, temperature) at different depths.</li>
+    <li>Build a custom PVC pressure hull with robust communication and power management.</li>
+    <li>Make dam inspection safer and more efficient by removing diver risk and enabling predictive maintenance.</li>
+  </ul>
+</section>
+
+<section class="rv">
+  <h2><small>Block diagram</small>How the control system works</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 910 640" role="img" aria-label="NEPTUNE control flow block diagram">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8da2e8"/></marker></defs>
+      <g class="ln" marker-end="url(#ar)">
+        <path d="M450 60V88"/><path d="M450 140V183"/><path d="M230 215H273"/><path d="M660 215H627"/><path d="M450 245V288"/>
+        <path d="M350 340L205 388"/><path d="M550 340L695 388"/><path d="M205 440V478"/><path d="M695 440V478"/>
+        <path d="M205 535L330 573"/><path d="M695 535L570 573"/>
+        <path class="fb" d="M640 600H885V115H612"/>
+      </g>
+      <text x="898" y="360" fill="#8da2e8" font-size="11" text-anchor="middle" transform="rotate(90 898 360)">feedback / next 100 Hz cycle</text>
+      <circle r="4.5" fill="#4de1ff"><animateMotion dur="7s" repeatCount="indefinite" path="M450 60V185V290L205 390V480L330 575H640H885V115H612"/></circle>
+      <circle r="4.5" fill="#e6c84a"><animateMotion dur="5s" repeatCount="indefinite" path="M450 245V290L695 390V480L570 575"/></circle>
+
+      <g class="node" tabindex="0" data-t="Power-On &amp; Initialization" data-d="The system starts by powering up and initializing the motor drivers and PWM signals, so every thruster and actuator is ready for operation."><rect x="290" y="10" width="320" height="50" rx="10"/><text x="450" y="32">Power-On &amp; Initialization</text><text class="s" x="450" y="49">Motor Drivers + PWM</text></g>
+      <g class="node" tabindex="0" data-t="Communication Interface" data-d="A tethered Ethernet link sets up a ROS 2 handshake between the Raspberry Pi 5 and the ESP32-S3, keeping command and telemetry exchange in sync."><rect x="290" y="90" width="320" height="50" rx="10"/><text x="450" y="112">Communication Interface</text><text class="s" x="450" y="129">Tether Link / ROS 2 Handshake</text></g>
+      <g class="node" tabindex="0" data-t="Main Controller" data-d="The ESP32-S3 runs a 100 Hz FreeRTOS control loop that continuously processes velocity (cmd_vel) and payload commands coming from the topside controller."><rect x="275" y="185" width="350" height="60" rx="10"/><text x="450" y="211">Main Controller</text><text class="s" x="450" y="229">100 Hz ROS 2 Control Loop</text></g>
+      <g class="node" tabindex="0" data-t="Sensor Suite" data-d="The IMU, depth and water-quality sensors are polled at set intervals. Their data feeds the control loop for navigation and environmental monitoring."><rect x="20" y="190" width="210" height="50" rx="10"/><text x="125" y="212">Sensor Suite</text><text class="s" x="125" y="229">IMU, Depth, Water Quality</text></g>
+      <g class="node" tabindex="0" data-t="Command Input" data-d="Velocity commands (cmd_vel) and payload commands arrive from the operator's control application and go into the main control loop."><rect x="660" y="190" width="200" height="50" rx="10"/><text x="760" y="212">Command Input</text><text class="s" x="760" y="229">cmd_vel + Payload Commands</text></g>
+      <g class="node y" tabindex="0" data-t="Safety &amp; Failsafe Module" data-d="A heartbeat monitor checks that communication is healthy. The depth envelope check prevents over-submersion, triggering a surface routine or thruster shutdown if limits are exceeded."><rect x="260" y="290" width="380" height="50" rx="10"/><text x="450" y="312">Safety &amp; Failsafe Module</text><text class="s" x="450" y="329">Heartbeat Monitor + Depth Envelope Check</text></g>
+      <g class="node y" tabindex="0" data-t="Differential Thrust Drive" data-d="A 4-thruster allocation matrix calculates surge, yaw, heave and pitch, then distributes PWM signals to the port, starboard, fore and aft thrusters for precise maneuvering."><rect x="40" y="390" width="330" height="50" rx="10"/><text x="205" y="412">Differential Thrust Drive</text><text class="s" x="205" y="429">4-Thruster Allocation Matrix</text></g>
+      <g class="node y" tabindex="0" data-t="Linear Actuation System" data-d="Payload commands are parsed to control the MG995 servo and linear shaft, enabling mechanical tasks like sample collection or moving an inspection arm."><rect x="530" y="390" width="330" height="50" rx="10"/><text x="695" y="412">Linear Actuation System</text><text class="s" x="695" y="429">Payload Servo Control</text></g>
+      <g class="node" tabindex="0" data-t="Thrusters" data-d="Port and starboard, fore and aft thrusters, driven by PWM output from the differential thrust drive."><rect x="40" y="480" width="330" height="55" rx="10"/><text x="205" y="505">Thrusters</text><text class="s" x="205" y="523">Port/Starboard, Fore/Aft (PWM Output)</text></g>
+      <g class="node" tabindex="0" data-t="Payload Actuator" data-d="An MG995 servo with a linear shaft carries out the payload tasks."><rect x="530" y="480" width="330" height="55" rx="10"/><text x="695" y="505">Payload Actuator</text><text class="s" x="695" y="523">MG995 Servo + Linear Shaft</text></g>
+      <g class="node" tabindex="0" data-t="Telemetry Publisher" data-d="Telemetry is published back through micro-ROS, then the loop repeats on the next 100 Hz cycle."><rect x="260" y="575" width="380" height="50" rx="10"/><text x="450" y="597">Telemetry Publisher</text><text class="s" x="450" y="614">micro-ROS</text></g>
+    </svg>
+    <div class="info" id="info"><b>Hover or tap a block</b><span style="color:var(--muted)">to see what it does. The glowing dots show how data flows through the system.</span></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Software architecture</small>Laptop, link and onboard brains</h2>
+  <div class="arch">
+    <div class="box lap"><h3>Laptop application (control station)</h3><ul><li>Control Panel</li><li>Live Camera Feed</li><li>Sensor Dashboard</li><li>Defect Detection &amp; Data Archive</li></ul></div>
+    <div class="link">Ethernet link · ROS 2 communication<br>↑ camera feed, sensor data, YOLO detections &nbsp;·&nbsp; ↓ control commands, mission data</div>
+    <div class="two">
+      <div class="box pi"><h3>Raspberry Pi 5 (ROS 2)</h3><ul><li>VI-SLAM &amp; Mapping</li><li>Camera Node</li><li>Mission Control</li></ul></div>
+      <div class="box esp"><h3>ESP32-S3 (FreeRTOS)</h3><ul><li>Motor Control</li><li>Sensor Polling</li><li>Safety Watchdog</li></ul></div>
+    </div>
+    <p>Together, the two form a dual-compute architecture that keeps the ROV responsive and safe: the Pi handles heavy processing while the ESP32-S3 handles real-time control.</p>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Components</small>Hardware and software</h2>
+  <div class="chips">
+    <div class="grp"><h3>Compute</h3><ul><li>Raspberry Pi 5</li><li>ESP32-S3</li></ul></div>
+    <div class="grp"><h3>Vision</h3><ul><li>Waveshare IMX327 Starlight camera</li><li>Dual green lasers for optical scaling</li></ul></div>
+    <div class="grp"><h3>Navigation</h3><ul><li>WIT JY901S 9-axis IMU</li><li>MS5837-30BA depth sensor</li><li>Dual JSN-SR04T ultrasonic modules</li></ul></div>
+    <div class="grp"><h3>Water quality</h3><ul><li>ADS1115 ADC</li><li>pH, ORP, TDS and turbidity probes</li><li>DS18B20 temperature sensor</li></ul></div>
+    <div class="grp"><h3>Actuation &amp; power</h3><ul><li>4 thrusters</li><li>MG995 servo + linear actuator</li><li>12 V 18 Ah Amaron Quanta battery</li><li>Custom PVC pressure hull</li></ul></div>
+    <div class="grp"><h3>Software</h3><ul><li>ROS 2 and micro-ROS</li><li>FreeRTOS firmware (ESP32-S3)</li><li>Python + OpenCV, YOLOv8s defect detection</li><li>PyQt5 control app</li><li>SQLite / Firebase storage</li><li>Visual-Inertial SLAM for 3D mapping</li></ul></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Circuit diagram</small>How it is wired</h2>
+  <button class="full" id="fullBtn" type="button">⤢ Full view</button>
+  <div class="circuit">
+    <div class="stage" id="stage">
+      <img id="cimg" src="../images/neptune-circuit.jpg" alt="NEPTUNE circuit diagram showing the battery, buck converters, Raspberry Pi 5, ESP32-S3, thruster drivers, sensors and water-quality probes" loading="lazy">
+        <div class="zone" tabindex="0" data-t="Power" data-d="Powers the whole system: a 12 V battery feeds two DC-DC buck converters (5 V and 3.3 V) for the controllers, and 12 V also goes to the thruster drivers." style="left:0.7%;top:2%;width:23.2%;height:56%"></div>
+        <div class="zone" tabindex="0" data-t="Raspberry Pi 5" data-d="The high-level computer (ROS 2, camera, mapping). It talks to the ESP32-S3 over a UART link (TX/RX)." style="left:25.6%;top:23.4%;width:22.7%;height:35.8%"></div>
+        <div class="zone" tabindex="0" data-t="ESP32-S3" data-d="The real-time controller. It sends PWM signals to the four thruster drivers, reads the sensors over I²C, and drives the sonar and servo." style="left:53.6%;top:24%;width:8.2%;height:35.2%"></div>
+        <div class="zone" tabindex="0" data-t="Propulsion zone" data-d="Four thrusters, each with its own driver (ESC), get 12 V power and a PWM signal from the ESP32-S3." style="left:68.2%;top:0.7%;width:31.3%;height:68.4%"></div>
+        <div class="zone" tabindex="0" data-t="Analog water-quality zone" data-d="The pH, TDS, turbidity and ORP probes pass through op-amp buffers into the ADS1115 ADC, which sends the readings over I²C." style="left:0.4%;top:61.2%;width:47.9%;height:38.4%"></div>
+        <div class="zone" tabindex="0" data-t="Navigation zone" data-d="The MS5837 depth sensor and JY901S IMU share the I²C bus (SDA/SCL) and give depth and orientation." style="left:49.6%;top:61.2%;width:17.5%;height:38.4%"></div>
+        <div class="zone" tabindex="0" data-t="Payload &amp; sonar zone" data-d="The JSN-SR04T ultrasonic sensor (TRIG/ECHO) and an MG995 servo for the payload." style="left:68.2%;top:71.4%;width:31.3%;height:28.3%"></div>
+      <div class="lens" id="lens"></div>
+    </div>
+  </div>
+  <div class="info" id="cinfo"><b>Hover or tap a zone</b><span style="color:var(--muted)">to see what it does. Move the cursor over the diagram to magnify it, or use Full view to zoom and drag.</span></div>
+</section>
+
+<div class="viewer" id="viewer">
+  <div class="vbtns"><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zout" type="button" aria-label="Zoom out">−</button><button id="zreset" type="button">Reset</button><button id="vclose" type="button" aria-label="Close">✕</button></div>
+  <img id="vimg" src="../images/neptune-circuit.jpg" alt="NEPTUNE circuit diagram, full view" draggable="false">
+</div>
+
+<section class="rv" style="padding-top:0">
+  <a class="back" href="../index.html#projects">← Back to projects</a>
+</section>
+
+<footer>© 2026 Harikrishnan M</footer>
+
+<script>
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+/* sound switch (same setting as the main site) */
+let muted=false; try{muted=localStorage.getItem('hm-muted')==='1'}catch(e){}
+const mb=document.getElementById('muteBtn');
+function setMuted(m){muted=m;mb.textContent=m?'🔇':'🔊';mb.title=m?'Sound off':'Sound on';try{localStorage.setItem('hm-muted',m?'1':'0')}catch(e){}}
+setMuted(muted); mb.onclick=()=>setMuted(!muted);
+let last=0;
+function blip(rate){const n=Date.now(); if(muted||n-last<120) return; last=n;
+  const a=new Audio('../audio/scan.mp3'); a.volume=.35; a.preservesPitch=false; a.webkitPreservesPitch=false; a.playbackRate=rate; a.play().catch(()=>{})}
+
+/* video placeholder */
+const src=document.querySelector('#demo source');
+src.addEventListener('error',()=>{document.getElementById('demo').style.display='none';document.getElementById('noVideo').style.display='flex'});
+
+/* block diagram: hover / focus / tap shows what each block does */
+const info=document.getElementById('info'), nodes=[...document.querySelectorAll('.node')];
+nodes.forEach((n,i)=>{
+  const show=()=>{nodes.forEach(x=>x.classList.remove('on'));n.classList.add('on');
+    info.innerHTML='<b></b><span style="color:var(--muted)"></span>';
+    info.firstChild.textContent=n.dataset.t; info.lastChild.textContent=n.dataset.d; blip(0.9+i*0.05)};
+  n.addEventListener('pointerenter',show); n.addEventListener('focus',show); n.addEventListener('click',show);
+});
+
+/* bubbles in the hero */
+if(!still){const h=document.querySelector('.hero');
+  for(let i=0;i<14;i++){const b=document.createElement('i');b.className='bub';const s=6+Math.random()*18;
+    b.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;animation-duration:${8+Math.random()*10}s;animation-delay:${-Math.random()*12}s`;h.appendChild(b)}}
+else document.querySelectorAll('circle animateMotion').forEach(a=>a.parentNode.remove());
+
+/* circuit diagram: magnifier lens, zone highlights, full view */
+const stage=document.getElementById('stage'), lens=document.getElementById('lens'), cimg=document.getElementById('cimg'), cinfo=document.getElementById('cinfo');
+const ZOOM=2.6, R=85;
+stage.addEventListener('pointerenter',e=>{ if(e.pointerType==='mouse'){lens.classList.add('show');blip(1.25)} });
+stage.addEventListener('pointerleave',e=>{ lens.classList.remove('show'); if(e.pointerType==='mouse') zones.forEach(o=>o.classList.remove('on')) });
+stage.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse') return;
+  const r=stage.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
+  lens.style.left=(x-R)+'px'; lens.style.top=(y-R)+'px';
+  lens.style.backgroundImage='url("'+(cimg.currentSrc||cimg.src)+'")';
+  lens.style.backgroundSize=(r.width*ZOOM)+'px '+(r.height*ZOOM)+'px';
+  lens.style.backgroundPosition=(R-x*ZOOM)+'px '+(R-y*ZOOM)+'px';
+});
+const zones=[...document.querySelectorAll('.zone')];
+zones.forEach((z,i)=>{
+  const show=()=>{zones.forEach(o=>o.classList.remove('on')); z.classList.add('on');
+    cinfo.innerHTML='<b></b><span style="color:var(--muted)"></span>'; cinfo.firstChild.textContent=z.dataset.t; cinfo.lastChild.textContent=z.dataset.d; blip(.85+i*.08)};
+  z.addEventListener('pointerenter',show); z.addEventListener('focus',show); z.addEventListener('click',show);
+});
+const viewer=document.getElementById('viewer'), vimg=document.getElementById('vimg');
+let sc=1,tx=0,ty=0,drag=null;
+const apply=()=>{vimg.style.transform='translate('+tx+'px,'+ty+'px) scale('+sc+')'};
+function fit(){
+  const nw=cimg.naturalWidth||1408, nh=cimg.naturalHeight||768;
+  const w=Math.min(innerWidth*.96,innerHeight*.9*nw/nh), h=w*nh/nw;
+  vimg.style.width=w+'px'; vimg.style.height=h+'px'; sc=1; tx=(innerWidth-w)/2; ty=(innerHeight-h)/2; apply();
+}
+function zoomAt(f,cx,cy){const ns=Math.min(6,Math.max(1,sc*f)); if(ns===1) return fit(); const k=ns/sc; tx=cx-(cx-tx)*k; ty=cy-(cy-ty)*k; sc=ns; apply()}
+function openV(){viewer.classList.add('open'); document.body.style.overflow='hidden'; fit(); blip(.7)}
+function closeV(){viewer.classList.remove('open'); document.body.style.overflow=''; blip(1.4)}
+document.getElementById('fullBtn').onclick=openV;
+document.getElementById('vclose').onclick=closeV;
+document.getElementById('zin').onclick=()=>zoomAt(1.4,innerWidth/2,innerHeight/2);
+document.getElementById('zout').onclick=()=>zoomAt(1/1.4,innerWidth/2,innerHeight/2);
+document.getElementById('zreset').onclick=fit;
+addEventListener('keydown',e=>{ if(e.key==='Escape'&&viewer.classList.contains('open')) closeV() });
+addEventListener('resize',()=>{ if(viewer.classList.contains('open')) fit() });
+viewer.addEventListener('wheel',e=>{e.preventDefault(); zoomAt(e.deltaY<0?1.2:1/1.2,e.clientX,e.clientY)},{passive:false});
+vimg.addEventListener('pointerdown',e=>{drag={x:e.clientX-tx,y:e.clientY-ty}; vimg.setPointerCapture(e.pointerId); viewer.style.cursor='grabbing'});
+vimg.addEventListener('pointermove',e=>{if(!drag) return; tx=e.clientX-drag.x; ty=e.clientY-drag.y; apply()});
+const endDrag=()=>{drag=null; viewer.style.cursor='grab'};
+vimg.addEventListener('pointerup',endDrag); vimg.addEventListener('pointercancel',endDrag);
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

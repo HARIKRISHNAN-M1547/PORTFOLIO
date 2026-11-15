@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automated Mushroom Cultivation System | Harikrishnan M</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#050816;--panel:#0b1230;--blue:#2350ff;--sky:#6f93ff;--cyan:#4de1ff;--cream:#ece6d8;--teal:#19b5b0;--text:#e8ecff;--muted:#9aa4d0}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--text);font-family:'Archivo',system-ui,sans-serif;line-height:1.65;overflow-x:hidden}
+a{color:inherit}
+section{padding:80px 6vw;max-width:1200px;margin:0 auto}
+h2{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;font-stretch:110%;line-height:1.05;margin-bottom:28px}
+h2 small{display:block;font:500 .85rem 'Space Grotesk',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--sky);margin-bottom:10px}
+p{color:var(--muted);max-width:70ch}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s,transform .9s}.rv.in{opacity:1;transform:none}
+
+/* top bar */
+.bar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:16px 6vw;background:linear-gradient(var(--ink),transparent)}
+.bar a{text-decoration:none;color:var(--muted);font-size:.95rem}.bar a:hover,.bar button:hover{color:#fff}
+.bar button{background:none;border:0;color:var(--muted);font-size:1rem;cursor:pointer}
+
+/* hero */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 6vw 60px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 100%,#1a3cff 0%,#0a1650 45%,var(--ink) 85%)}
+.hero .in-wrap{position:relative;z-index:2;max-width:1200px;margin:0 auto;width:100%}
+.hero .tagline{font:500 1rem 'Space Grotesk',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan)}
+.hero h1{font-size:clamp(3.5rem,13vw,11rem);font-weight:900;font-stretch:125%;line-height:.95;color:#fff;margin:10px 0 18px}
+.hero p{font-size:1.15rem}
+.bub{position:absolute;bottom:-30px;border-radius:50%;border:1px solid rgba(143,176,255,.45);animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-110vh) translateX(20px);opacity:0}}
+.video{margin-top:36px;border:1px solid rgba(111,147,255,.4);border-radius:16px;overflow:hidden;background:#071040;aspect-ratio:16/9;max-width:900px}
+.video video{width:100%;height:100%;display:block;background:#000}
+.video .empty{height:100%;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.stat{background:var(--panel);border:1px solid #16205a;padding:22px;clip-path:polygon(0 0,88% 0,100% 16%,100% 100%,0 100%)}
+.stat b{display:block;font-size:2.2rem;font-weight:800;color:var(--cyan);line-height:1.1}
+.stat span{color:var(--muted);font-size:.95rem}
+ul.plain{list-style:none;display:grid;gap:12px;max-width:80ch}
+ul.plain li{padding-left:22px;position:relative;color:var(--muted)}
+ul.plain li::before{content:"";position:absolute;left:0;top:.7em;width:8px;height:8px;background:var(--blue);border-radius:2px}
+
+/* block diagram */
+.diagram{background:var(--panel);border:1px solid #16205a;border-radius:16px;padding:16px;overflow-x:auto}
+.diagram svg{display:block;min-width:640px;width:100%;height:auto}
+.node rect{fill:#141f55;stroke:var(--sky);stroke-width:1.5;transition:.2s}
+.node.y rect{fill:#3a3410;stroke:#e6c84a}
+.node text{fill:#e8ecff;font:600 13px 'Space Grotesk',sans-serif;text-anchor:middle;pointer-events:none}
+.node text.s{font-weight:500;font-size:11.5px;fill:#b9c4ef}
+.node{cursor:pointer;outline:none}
+.node:hover rect,.node:focus rect,.node.on rect{fill:var(--blue);stroke:var(--cyan)}
+.ln{stroke:#8da2e8;stroke-width:1.6;fill:none}.fb{stroke-dasharray:6 5}
+.info{margin-top:16px;padding:18px 20px;border-left:4px solid var(--cyan);background:#0a1240;border-radius:4px 12px 12px 4px;min-height:96px}
+.info b{display:block;color:#fff;margin-bottom:4px;font-size:1.05rem}
+.hint{font-size:.9rem;margin-top:10px}
+
+/* architecture */
+.arch{display:grid;gap:14px;max-width:900px}
+.box{border-radius:14px;padding:18px 20px}
+.box h3{font-size:1.05rem;margin-bottom:8px}
+.box ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.box li{background:rgba(255,255,255,.1);padding:5px 12px;border-radius:999px;font-size:.9rem}
+.lap{background:#17307f}.link{background:#1c1c24;text-align:center;color:var(--muted);padding:10px;border-radius:10px;font-size:.95rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.pi{background:#14502a}.esp{background:#6a3a12}
+
+/* components */
+.chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.grp{background:var(--panel);border:1px solid #16205a;border-radius:14px;padding:18px 20px}
+.grp h3{font:700 1rem 'Space Grotesk',sans-serif;color:var(--cyan);margin-bottom:8px}
+.grp li{list-style:none;color:var(--muted);font-size:.95rem;padding:3px 0}
+.circuit{position:relative;background:#fff;border-radius:14px;padding:8px}
+.stage{position:relative;cursor:crosshair}
+.stage img{width:100%;display:block;border-radius:8px}
+.zone{position:absolute;border:2px solid transparent;border-radius:12px;transition:.2s;outline:none}
+.zone:hover,.zone:focus,.zone.on{border-color:#0a8fb0;background:rgba(77,225,255,.16);box-shadow:0 0 0 2px rgba(77,225,255,.4),0 0 24px rgba(77,225,255,.5)}
+.lens{position:absolute;z-index:3;width:170px;height:170px;border-radius:50%;border:3px solid var(--cyan);pointer-events:none;opacity:0;transition:opacity .15s;
+  background-color:#fff;background-repeat:no-repeat;background-origin:border-box;box-shadow:0 8px 30px rgba(0,0,0,.5),0 0 20px rgba(77,225,255,.6)}
+.lens.show{opacity:1}
+.full{display:block;margin:0 0 12px auto;background:rgba(5,8,22,.85);color:#fff;border:1px solid var(--sky);border-radius:999px;padding:8px 16px;font:600 .85rem 'Space Grotesk',sans-serif;cursor:pointer}
+.full:hover{background:var(--blue)}
+.viewer{display:none;position:fixed;inset:0;z-index:100;background:#050816;overflow:hidden;touch-action:none;cursor:grab}
+.viewer.open{display:block}
+.viewer img{position:absolute;left:0;top:0;max-width:none;transform-origin:0 0;user-select:none;-webkit-user-drag:none;background:#fff;border-radius:6px}
+.vbtns{position:fixed;top:14px;right:14px;z-index:101;display:flex;gap:8px}
+.vbtns button{background:var(--panel);color:#fff;border:1px solid var(--sky);border-radius:999px;min-width:42px;height:42px;padding:0 14px;font:600 1rem 'Space Grotesk',sans-serif;cursor:pointer}
+.vbtns button:hover{background:var(--blue)}
+
+/* back link */
+.refs li{margin-bottom:8px}
+.back{display:inline-block;margin-top:28px;padding:14px 26px;border:2px solid var(--blue);border-radius:999px;font-weight:700;text-decoration:none;transition:.2s}
+.back:hover{background:var(--blue)}
+footer{padding:28px 6vw;color:var(--muted);font-size:.9rem;border-top:1px solid #16205a}
+@media(max-width:700px){.two{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.bub{display:none}.rv{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+
+/* ---- mushroom page overrides ---- */
+:root{--cyan:#5ff0d8}
+.hero h1{margin:0 0 6px;line-height:1;font-size:1rem}
+.hero h1 span{display:block;opacity:0;transform:translateY(40px);animation:up .9s cubic-bezier(.2,.7,.2,1) forwards}
+.hero h1 .l1{font-size:clamp(1.5rem,4.6vw,3.8rem);font-weight:900;font-stretch:125%;letter-spacing:.06em;color:transparent;-webkit-text-stroke:2px var(--cyan);animation-delay:.1s}
+.hero h1 .l2{font-size:clamp(3rem,11.5vw,10rem);font-weight:900;font-stretch:125%;line-height:.9;color:#fff;text-shadow:0 0 70px rgba(95,240,216,.35);animation-delay:.3s}
+.hero h1 .l3{display:inline-block;margin-top:.5em;font-size:clamp(1.1rem,3.6vw,3rem);font-weight:800;font-stretch:115%;letter-spacing:.16em;
+  background:linear-gradient(90deg,#5ff0d8,#ece6d8 70%);-webkit-background-clip:text;background-clip:text;color:transparent;animation-delay:.5s}
+.hero .rule{width:110px;height:4px;border-radius:4px;margin:26px 0 20px;background:linear-gradient(90deg,#5ff0d8,transparent);animation:grow 1.2s .7s ease both}
+@keyframes up{to{opacity:1;transform:none}}
+@keyframes grow{from{width:0}}
+.hero .lead{border-left:3px solid var(--teal);padding-left:16px;max-width:52ch;color:#b8e8e0}
+.shroom{position:absolute;right:6vw;bottom:9%;width:min(32vw,400px);z-index:1;opacity:.3;pointer-events:none;animation:float 7s ease-in-out infinite}
+.shroom .cap{display:block;height:min(16vw,200px);border-radius:100% 100% 16% 16% / 100% 100% 30% 30%;
+  background:radial-gradient(circle at 24% 42%,rgba(255,255,255,.55) 0 6%,transparent 7%),radial-gradient(circle at 58% 28%,rgba(255,255,255,.5) 0 8%,transparent 9%),radial-gradient(circle at 80% 55%,rgba(255,255,255,.5) 0 5%,transparent 6%),linear-gradient(180deg,#5ff0d8,#19b5b0)}
+.shroom .stem{display:block;width:34%;height:min(13vw,165px);margin:-3px auto 0;border-radius:0 0 42% 42%;background:linear-gradient(90deg,#ece6d8,#c9c1ab)}
+@keyframes float{50%{transform:translateY(-12px)}}
+@media(max-width:760px){.shroom{display:none}}
+@media(prefers-reduced-motion:reduce){.hero h1 span,.hero .rule{animation:none;opacity:1;transform:none}.shroom{animation:none}}
+.hero{background:radial-gradient(ellipse at 50% 100%,#12877f 0%,#0a3a40 45%,var(--ink) 85%)}
+.bub{border-color:rgba(95,240,216,.5)}
+.node.g rect{fill:#0f3b36;stroke:#19b5b0}
+.node.o rect{fill:#3a1a14;stroke:#e8876a}
+.node.g:hover rect,.node.o:hover rect,.node.g.on rect,.node.o.on rect{fill:var(--blue);stroke:var(--cyan)}
+.node:hover .dia,.node.on .dia{fill:#5a4f12}
+.mains{fill:rgba(232,135,106,.06);stroke:#e8876a;stroke-dasharray:6 5;stroke-width:1.5}
+.wl{fill:#9fe8d9;font:500 11px 'Space Grotesk',sans-serif}
+.w1{stroke:#19b5b0}.w2{stroke:#e8876a}.w3{stroke:#8da2e8}
+.pins{width:100%;border-collapse:collapse;margin-top:18px;font-size:.95rem}
+.pins th,.pins td{text-align:left;padding:10px 14px;border-bottom:1px solid #16205a;color:var(--muted)}
+.pins th{color:var(--cyan);font:700 .9rem 'Space Grotesk',sans-serif}
+.pins td:first-child{color:#fff}
+.tablewrap{overflow-x:auto}
+.warn{margin-top:18px;padding:14px 18px;border-left:4px solid #e8876a;background:#1a1012;border-radius:4px 12px 12px 4px;color:#f2c1b2;max-width:80ch;font-size:.95rem}
+.two2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.sim{display:grid;grid-template-columns:1.2fr 1fr;gap:22px;align-items:start}
+.ctl{background:var(--panel);border:1px solid #16205a;border-radius:16px;padding:22px}
+.ctl label{display:flex;justify-content:space-between;color:var(--muted);font-size:.95rem;margin-top:14px}
+.ctl label b{color:#fff}
+.ctl input[type=range]{width:100%;accent-color:#19b5b0;margin-top:6px}
+.lamps{display:grid;gap:12px}
+.lamp{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid #16205a;border-radius:14px;padding:16px 18px;transition:.25s}
+.lamp i{width:16px;height:16px;border-radius:50%;background:#2a3463;transition:.25s}
+.lamp b{color:#fff;font-weight:600}.lamp span{margin-left:auto;font:700 .9rem 'Space Grotesk',sans-serif;color:var(--muted)}
+.lamp.on{border-color:#19b5b0;background:#0a2a2e}
+.lamp.on i{background:#5ff0d8;box-shadow:0 0 14px #5ff0d8}.lamp.on span{color:#5ff0d8}
+.why{margin-top:14px;font-size:.93rem;color:var(--muted);min-height:3.2em}
+.flow{background:var(--panel);border:1px solid #16205a;border-radius:16px;padding:16px;overflow-x:auto}
+.flow svg{display:block;margin:0 auto;min-width:520px;max-width:620px;width:100%;height:auto}
+.flow .node rect{fill:#141f55}
+.dia{fill:#3a3410;stroke:#e6c84a;stroke-width:1.5}
+.cards3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.card3{background:var(--panel);border:1px solid #16205a;border-radius:14px;padding:20px 22px;border-top:3px solid var(--teal)}
+.card3 h3{font-size:1.05rem;margin-bottom:6px}.card3 p{font-size:.93rem}
+details.code{background:#030510;border:1px solid #16205a;border-radius:14px;overflow:hidden}
+details.code summary{cursor:pointer;padding:16px 20px;color:#fff;font-weight:600;list-style:none}
+details.code summary::-webkit-details-marker{display:none}
+details.code summary::after{content:"  ▾  show code";color:var(--cyan);font-weight:500;font-size:.9rem}
+details.code[open] summary::after{content:"  ▴  hide code"}
+.codebar{display:flex;gap:10px;flex-wrap:wrap;padding:0 20px 14px}
+.codebar button,.codebar a{background:var(--panel);color:#fff;border:1px solid var(--sky);border-radius:999px;padding:8px 16px;font:600 .85rem 'Space Grotesk',sans-serif;cursor:pointer;text-decoration:none}
+.codebar button:hover,.codebar a:hover{background:var(--blue)}
+pre{margin:0;padding:18px 20px;overflow:auto;max-height:560px;font:13px/1.6 ui-monospace,Consolas,'Courier New',monospace;color:#cfe0ff;border-top:1px solid #16205a}
+@media(max-width:760px){.sim,.two2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="bar"><a href="../index.html#projects">← Back to projects</a><button id="muteBtn" type="button" aria-label="Turn sound on or off" title="Sound on">🔊</button></div>
+
+<header class="hero">
+  <div class="shroom" aria-hidden="true"><i class="cap"></i><i class="stem"></i></div>
+  <div class="in-wrap">
+    <h1 aria-label="Automated Mushroom Cultivation System"><span class="l1">AUTOMATED</span><span class="l2">MUSHROOM</span><span class="l3">CULTIVATION SYSTEM</span></h1>
+    <div class="rule"></div>
+    <p class="lead">A closed-loop controller that keeps an oyster mushroom chamber at the right humidity, fresh air and light, without anyone watching it.</p>
+  </div>
+</header>
+
+<section class="rv">
+  <h2><small>Overview</small>The problem and the solution</h2>
+  <div class="two2">
+    <div><p><b style="color:#fff">The problem.</b> Oyster mushrooms need 85–95% humidity, about 18–24 °C and CO₂ kept below roughly 1000 ppm. Doing this by hand means checking and adjusting misting, ventilation and light all day, and small lapses lead to poor yield, contamination or deformed fruit.</p></div>
+    <div><p><b style="color:#fff">The solution.</b> A closed-loop controller built on an ESP32 reads temperature, humidity and (optionally) CO₂, and switches a humidifier, an exhaust fan and a grow light through a relay module to hold the chamber in range.</p></div>
+  </div>
+  <div class="stats" style="margin-top:28px">
+    <div class="stat"><b>87–92%</b><span>humidity hysteresis band</span></div>
+    <div class="stat"><b>10 s</b><span>sensor read interval</span></div>
+    <div class="stat"><b>12 h</b><span>photoperiod, 08:00 to 20:00</span></div>
+    <div class="stat"><b>3 + 1</b><span>relay loads (humidifier, fan, light) plus a spare</span></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Block diagram</small>A closed control loop</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 900 420" role="img" aria-label="Mushroom system block diagram">
+      <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8da2e8"/></marker></defs>
+      <g class="ln" marker-end="url(#ar2)">
+        <path d="M280 90L340 190"/><path d="M620 90L560 190"/><path d="M450 240V300"/><path d="M560 335H620"/>
+        <path d="M730 370V395H170V372"/><path class="fb" d="M170 300V112"/>
+      </g>
+      <text x="152" y="205" fill="#8da2e8" font-size="11" text-anchor="middle" transform="rotate(-90 152 205)">feedback: re-sensed</text>
+      <circle r="4.5" fill="#5ff0d8"><animateMotion dur="8s" repeatCount="indefinite" path="M170 112L340 195L450 240V300L560 335H730V395H170V300V112"/></circle>
+      <g class="node g" tabindex="0" data-t="Sensors (DHT22, MH-Z19B)" data-d="The DHT22 gives temperature and humidity every 10 seconds. The optional MH-Z19B gives CO₂ over UART, used to trigger fresh-air exchange more precisely than a fixed timer."><rect x="60" y="40" width="220" height="70" rx="10"/><text x="170" y="70">Sensors</text><text class="s" x="170" y="90">DHT22, MH-Z19B</text></g>
+      <g class="node" tabindex="0" data-t="Wi-Fi / NTP" data-d="Wi-Fi and NTP give the controller the time for the lighting schedule. They are not needed for the core humidity and ventilation loop to work."><rect x="620" y="40" width="220" height="70" rx="10"/><text x="730" y="70">Wi-Fi / NTP</text><text class="s" x="730" y="90">light schedule clock</text></g>
+      <g class="node" tabindex="0" data-t="ESP32 Controller" data-d="The central controller. It reads the sensors, applies hysteresis-based control logic, drives the relay outputs and keeps the NTP-synced lighting schedule, all in one non-blocking control loop."><rect x="340" y="160" width="220" height="80" rx="10"/><text x="450" y="196">ESP32 Controller</text><text class="s" x="450" y="216">hysteresis logic</text></g>
+      <g class="node o" tabindex="0" data-t="Relay Module (4-channel)" data-d="An opto-isolated relay module. The ESP32 sends low-voltage logic signals to IN1–IN4, and the relay contacts switch the mains side of each actuator, keeping the two sides isolated."><rect x="340" y="300" width="220" height="70" rx="10"/><text x="450" y="330">Relay Module</text><text class="s" x="450" y="350">4-channel, active-LOW</text></g>
+      <g class="node o" tabindex="0" data-t="Actuators" data-d="A humidifier (mist maker) for moisture, an exhaust fan for fresh-air exchange and cooling assistance, and a grow light for the daily photoperiod."><rect x="620" y="300" width="220" height="70" rx="10"/><text x="730" y="330">Actuators</text><text class="s" x="730" y="350">Fan, Humidifier, Light</text></g>
+      <g class="node" tabindex="0" data-t="Grow tent environment" data-d="The chamber itself. The actuators change its humidity, air and light, and the sensors measure the result, which closes the loop."><rect x="60" y="300" width="220" height="70" rx="10"/><text x="170" y="330">Grow Tent</text><text class="s" x="170" y="350">Environment</text></g>
+    </svg>
+    <div class="info" data-info><b>Hover or tap a block</b><span style="color:var(--muted)">to see what it does. The glowing dot shows the loop running.</span></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Wiring diagram</small>How it is connected</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 900 480" role="img" aria-label="Mushroom system wiring diagram">
+      <defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8da2e8"/></marker></defs>
+      <rect class="mains" x="625" y="232" width="270" height="208" rx="14"/>
+      <text class="wl" x="640" y="428" fill="#e8876a" style="fill:#e8876a">MAINS SIDE · isolated by the relay</text>
+      <g fill="none" stroke-width="2" marker-end="url(#ar3)">
+        <path class="w1" d="M190 90L330 185"/><path class="w1" d="M190 200L330 222"/>
+        <path class="w3" d="M530 190L650 78"/>
+        <path class="w2" d="M210 440H610V130H650"/><path class="w2" d="M210 420L395 290"/>
+        <path stroke="#e8876a" d="M700 150L695 260"/><path stroke="#e8876a" d="M760 150V345"/><path stroke="#e8876a" d="M820 150L825 260"/>
+      </g>
+      <text class="wl" x="215" y="125" transform="rotate(34 215 125)">DATA → GPIO4</text>
+      <text class="wl" x="228" y="198" transform="rotate(9 228 198)">RX16 / TX17</text>
+      <text class="wl" x="520" y="112" transform="rotate(-42 520 112)">GPIO26/27/14/12 → IN1–IN4</text>
+      <text class="wl" x="250" y="372" transform="rotate(-38 250 372)">5 V / GND</text>
+      <text class="wl" x="440" y="458">12 V supply + buck converter (5 V) to the relay module</text>
+      <g class="node g" tabindex="0" data-t="DHT22 (temp / humidity)" data-d="Single-wire digital sensor on GPIO4. Range -40 to 80 °C and 0–100% RH, accuracy about ±0.5 °C and ±2–5% RH, with a minimum sample interval of about 2 seconds."><rect x="20" y="60" width="170" height="60" rx="10"/><text x="105" y="86">DHT22</text><text class="s" x="105" y="104">Temp / RH</text></g>
+      <g class="node g" tabindex="0" data-t="MH-Z19B (CO₂, optional)" data-d="NDIR CO₂ sensor over UART2 (RX16 / TX17) at 9600 baud, range 0–5000 ppm, 4.5–5.5 V supply. Optional: without it the system falls back to a timed fresh-air cycle."><rect x="20" y="170" width="170" height="60" rx="10"/><text x="105" y="196">MH-Z19B</text><text class="s" x="105" y="214">CO₂, UART</text></g>
+      <g class="node" tabindex="0" data-t="ESP32 dev board" data-d="Dual-core 240 MHz controller with Wi-Fi and Bluetooth, running at 3.3 V logic. It reads the sensors, drives the relay inputs and gets the time over Wi-Fi/NTP."><rect x="330" y="150" width="200" height="140" rx="12"/><text x="430" y="212">ESP32</text><text class="s" x="430" y="232">DEV BOARD</text></g>
+      <g class="node o" tabindex="0" data-t="4-channel relay module (active-LOW)" data-d="Opto-isolated inputs IN1–IN4 on GPIO26, 27, 14 and 12. Most boards are active-LOW, meaning the relay energises when its IN pin is pulled LOW. Verify this with a multimeter before connecting any mains load."><rect x="650" y="40" width="220" height="110" rx="12"/><text x="760" y="88">4-CH RELAY</text><text class="s" x="760" y="108">MODULE · active-LOW</text></g>
+      <g class="node o" tabindex="0" data-t="Mist maker (humidifier)" data-d="Switched by relay 1 (GPIO26). Turns on below 87% RH and off above 92% RH, plus a 60-second burst after each fresh-air cycle."><rect x="640" y="260" width="110" height="60" rx="10"/><text x="695" y="296">Mist maker</text></g>
+      <g class="node o" tabindex="0" data-t="Exhaust fan" data-d="Switched by relay 2 (GPIO27). Runs for fresh-air exchange when CO₂ is above 1000 ppm, or on a timed cycle without a CO₂ sensor, and is forced on above 24 °C as a cooling assist."><rect x="770" y="260" width="110" height="60" rx="10"/><text x="825" y="296">Exhaust fan</text></g>
+      <g class="node o" tabindex="0" data-t="Grow light" data-d="Switched by relay 3 (GPIO14) on a 12-hour schedule, 08:00 to 20:00, using Wi-Fi/NTP time so it holds correctly after a power cut, with no RTC module."><rect x="705" y="345" width="110" height="60" rx="10"/><text x="760" y="381">Grow light</text></g>
+      <g class="node o" tabindex="0" data-t="12 V supply + buck converter" data-d="A 12 V supply feeds the higher-current wiring, and a buck converter steps it down to 5 V / 3.3 V for the ESP32 and sensors. Keeping the rails separate reduces switching noise on the sensor readings. All low-voltage parts share a common ground, and the mains side uses fusing."><rect x="20" y="400" width="190" height="70" rx="10"/><text x="115" y="430">12 V Supply</text><text class="s" x="115" y="450">+ Buck Converter (5 V)</text></g>
+    </svg>
+    <div class="info" data-info><b>Hover or tap a part</b><span style="color:var(--muted)">to see its connection and specifications.</span></div>
+  </div>
+  <div class="tablewrap"><table class="pins">
+    <tr><th>Part</th><th>Connection</th><th>Purpose</th></tr>
+    <tr><td>DHT22</td><td>GPIO4 (data)</td><td>Temperature and humidity</td></tr>
+    <tr><td>MH-Z19B</td><td>UART2: RX16 / TX17</td><td>CO₂ (optional)</td></tr>
+    <tr><td>Relay IN1</td><td>GPIO26</td><td>Humidifier / mist maker</td></tr>
+    <tr><td>Relay IN2</td><td>GPIO27</td><td>Exhaust fan</td></tr>
+    <tr><td>Relay IN3</td><td>GPIO14</td><td>Grow light</td></tr>
+    <tr><td>Relay IN4</td><td>GPIO12</td><td>Spare (e.g. circulation fan)</td></tr>
+  </table></div>
+  <p class="warn"><b>Safety:</b> the relay contacts switch mains-voltage lines. Keep the mains side physically separate from the ESP32 and 5 V side, fuse it, and check the relay polarity (active-LOW or active-HIGH) with a multimeter before connecting any load.</p>
+</section>
+
+<section class="rv">
+  <h2><small>Try the logic</small>Control loop simulator</h2>
+  <p style="margin-bottom:22px">Move the sliders to see how the controller decides. It uses the same setpoints as the firmware: humidifier on below 87% and off above 92%, fan on above 1000 ppm CO₂ and off below 800 ppm, forced on above 24 °C, and light from 08:00 to 20:00.</p>
+  <div class="sim">
+    <div class="ctl">
+      <label>Humidity <b id="vRh">90%</b></label><input id="rh" type="range" min="70" max="100" value="90">
+      <label>Temperature <b id="vT">22 °C</b></label><input id="tc" type="range" min="15" max="30" value="22">
+      <label>CO₂ <b id="vCo">700 ppm</b></label><input id="co" type="range" min="400" max="1500" step="10" value="700">
+      <label>Time of day <b id="vH">12:00</b></label><input id="hr" type="range" min="0" max="23" value="12">
+      <p class="why" id="why"></p>
+    </div>
+    <div class="lamps">
+      <div class="lamp" id="lHum"><i></i><b>Humidifier</b><span>OFF</span></div>
+      <div class="lamp" id="lFan"><i></i><b>Exhaust fan</b><span>OFF</span></div>
+      <div class="lamp" id="lLit"><i></i><b>Grow light</b><span>OFF</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Software</small>Control loop flowchart</h2>
+  <div class="flow">
+    <svg viewBox="0 0 560 740" role="img" aria-label="Control loop flowchart">
+      <defs><marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8da2e8"/></marker></defs>
+      <g class="ln" marker-end="url(#ar4)">
+        <path d="M280 50V72"/><path d="M280 112V134"/><path d="M280 174V196"/><path d="M280 276V314"/><path d="M280 354V376"/><path d="M280 426V448"/>
+        <path d="M280 532V565"/><path d="M280 605V627"/><path d="M280 667V689"/>
+        <path d="M210 236H170"/><path d="M95 256V647H130"/>
+        <path d="M350 490H395"/><path d="M470 510V585H430"/>
+      </g>
+      <text class="wl" x="290" y="300">yes</text><text class="wl" x="182" y="228">no</text><text class="wl" x="290" y="553">no</text><text class="wl" x="364" y="482">yes</text>
+      <g class="node" tabindex="0" data-t="Start" data-d="Power-up."><rect x="200" y="10" width="160" height="40" rx="20"/><text x="280" y="35">Start</text></g>
+      <g class="node " tabindex="0" data-t="Init: sensors, relays, Wi-Fi + NTP" data-d="Sets every relay pin to off, starts the DHT22 and the optional CO₂ sensor, and connects to Wi-Fi so the clock can sync over NTP."><rect x="130" y="72" width="300" height="40" rx="8"/><text x="280.0" y="89.0">Init: sensors, relays, Wi-Fi + NTP</text></g>
+      <g class="node " tabindex="0" data-t="Read DHT22 every 10 s" data-d="Temperature and humidity are read every 10 seconds using millis() timing, so nothing blocks."><rect x="130" y="134" width="300" height="40" rx="8"/><text x="280.0" y="151.0">Read DHT22 every 10 s</text></g>
+      <g class="node" tabindex="0" data-t="Read valid?" data-d="If the DHT22 returns an invalid value, the cycle is skipped and tried again on the next tick."><polygon class="dia" points="280,196 350,236 280,276 210,236"/><text x="280" y="240" style="fill:#fff;font:600 12px 'Space Grotesk',sans-serif;text-anchor:middle">Read valid?</text></g>
+      <g class="node " tabindex="0" data-t="Skip cycle, retry" data-d="The failed cycle is skipped and retried next tick. The lighting check still runs."><rect x="20" y="216" width="150" height="40" rx="8"/><text x="95.0" y="233.0">Skip cycle, retry</text></g>
+      <g class="node " tabindex="0" data-t="Humidity control (87–92%)" data-d="Hysteresis: the humidifier turns ON below 87% and OFF above 92%, and holds its state in between, which stops relay chatter at the setpoint."><rect x="130" y="314" width="300" height="40" rx="8"/><text x="280.0" y="331.0">Humidity control (87–92%)</text></g>
+      <g class="node " tabindex="0" data-t="Fan: CO₂ / timed FAE / temp > 24 °C" data-d="With a CO₂ sensor, the fan turns ON above 1000 ppm and OFF below 800 ppm. Without one, a timed fresh-air cycle runs (5 minutes every hour). Above 24 °C the fan is forced on as a cooling assist."><rect x="130" y="376" width="300" height="50" rx="8"/><text x="280.0" y="398.0">Fan: CO₂ / timed FAE / temp > 24 °C</text></g>
+      <g class="node" tabindex="0" data-t="Fresh-air cycle just ended?" data-d="Ventilation dumps humidity. When a fan cycle finishes, the controller reacts so the fan does not undermine humidity control."><polygon class="dia" points="280,450 350,490 280,530 210,490"/><text x="280" y="494" style="fill:#fff;font:600 12px 'Space Grotesk',sans-serif;text-anchor:middle">FAE just ended?</text></g>
+      <g class="node " tabindex="0" data-t="Humidifier burst, 60 s" data-d="Forces the humidifier on for 60 seconds after a fresh-air cycle, so the humidity and ventilation loops do not work against each other."><rect x="395" y="470" width="150" height="40" rx="8"/><text x="470.0" y="487.0">Humidifier burst, 60 s</text></g>
+      <g class="node " tabindex="0" data-t="Apply relay states" data-d="Writes the humidifier and fan states to the relays. Relays are active-LOW, so ON means the pin is pulled LOW."><rect x="130" y="565" width="300" height="40" rx="8"/><text x="280.0" y="582.0">Apply relay states</text></g>
+      <g class="node " tabindex="0" data-t="Check NTP time → light 08–20 h" data-d="If the time is synced, the grow light is on between 08:00 and 20:00 and off otherwise, giving a 12-hour photoperiod that survives power cuts with no RTC module."><rect x="130" y="627" width="300" height="40" rx="8"/><text x="280.0" y="644.0">Check NTP time → light 08–20 h</text></g>
+      <g class="node" tabindex="0" data-t="Loop (non-blocking)" data-d="The loop never blocks. All timing uses millis(), not delay(), so sensor reads, relay logic and the lighting schedule all stay responsive."><rect x="180" y="689" width="200" height="40" rx="20"/><text x="280" y="714">Loop (non-blocking)</text></g>
+    </svg>
+    <div class="info" data-info><b>Hover or tap a step</b><span style="color:var(--muted)">to see what the controller does there.</span></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Features</small>What makes the controller reliable</h2>
+  <div class="cards3">
+    <div class="card3"><h3>Automated humidity control</h3><p>Hysteresis (87% ON, 92% OFF) avoids relay chatter. A short humidifier burst after each ventilation cycle stops the fan from undermining humidity.</p></div>
+    <div class="card3"><h3>Fresh-air exchange</h3><p>CO₂-driven fan control when an MH-Z19B is fitted, with a graceful fallback to a timed cycle when it isn't.</p></div>
+    <div class="card3"><h3>Temperature-assisted ventilation</h3><p>The fan is forced on above 24 °C, whatever the CO₂ state, as a simple cooling assist.</p></div>
+    <div class="card3"><h3>Scheduled lighting</h3><p>A Wi-Fi/NTP-based 12-hour photoperiod that holds across power cycles without a dedicated RTC module.</p></div>
+    <div class="card3"><h3>Non-blocking loop</h3><p>millis()-based timing keeps sensor reads, relay logic and the light schedule responsive in a single loop.</p></div>
+    <div class="card3"><h3>Modular and tunable</h3><p>CO₂ sensing is optional, and setpoints, pins and intervals are named constants for quick recalibration.</p></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Components</small>Hardware and software</h2>
+  <div class="chips">
+    <div class="grp"><h3>ESP32 dev board</h3><ul><li>Espressif dual-core 32-bit LX6, up to 240 MHz</li><li>Wi-Fi 802.11 b/g/n, Bluetooth 4.2 and BLE</li><li>3.3 V logic</li></ul></div>
+    <div class="grp"><h3>DHT22</h3><ul><li>-40 to 80 °C, 0–100% RH</li><li>±0.5 °C, ±2–5% RH</li><li>Single-wire digital, about 2 s sample interval</li></ul></div>
+    <div class="grp"><h3>MH-Z19B (optional)</h3><ul><li>NDIR CO₂, 0–5000 ppm</li><li>UART, 9600 baud default</li><li>4.5–5.5 V supply</li></ul></div>
+    <div class="grp"><h3>4-channel relay module</h3><ul><li>Opto-isolated, active-LOW trigger</li><li>Switches mains loads via COM/NO/NC</li></ul></div>
+    <div class="grp"><h3>Actuators</h3><ul><li>Ultrasonic mist maker (humidifier)</li><li>Inline exhaust fan</li><li>LED / fluorescent grow light</li></ul></div>
+    <div class="grp"><h3>Power and software</h3><ul><li>12 V supply with a buck converter and circuit protection</li><li>Arduino IDE, embedded C/C++</li><li>Wokwi simulation and serial logging</li></ul></div>
+  </div>
+</section>
+
+<section class="rv">
+  <h2><small>Source code</small>ESP32 firmware</h2>
+  <details class="code">
+    <summary>mushroom_controller.ino</summary>
+    <div class="codebar"><button id="copyBtn" type="button">Copy code</button><a href="../code/mushroom_controller.ino" download>Download .ino</a></div>
+    <pre><code id="src">/*
+  Automated Mushroom Cultivation Environmental Controller
+  Target: Oyster mushroom, fruiting stage, small grow tent
+  Board: ESP32
+
+  Sensors expected:
+    - DHT22 (or swap in SHT31 via I2C) for temp/humidity
+    - MH-Z19B CO2 sensor (UART) - optional but recommended for oyster FAE
+
+  Actuators (via 4-channel relay module, active LOW typical):
+    - Relay 1: Humidifier / ultrasonic mist maker
+    - Relay 2: Exhaust fan (fresh air exchange)
+    - Relay 3: Grow light
+    - Relay 4: spare (e.g. circulation fan)
+
+  Control strategy:
+    - Humidity and fan are both hysteresis-controlled (not simple thresholds)
+      to stop relay chatter right at the setpoint.
+    - The fan is prioritized by CO2 when a CO2 sensor is present, and falls
+      back to a timed FAE cycle (X minutes every hour) when it isn't.
+    - After every fan-driven FAE cycle, the humidifier is nudged on for a
+      short burst, since ventilation dumps humidity - this stops the two
+      loops from fighting each other.
+    - Light runs on a WiFi/NTP-based daily schedule so it holds correctly
+      even after a reboot (no RTC module required).
+
+  Wire the relay module's IN pins to the GPIOs below. Most cheap relay
+  boards are ACTIVE LOW (LOW = relay energized) - verify yours with a
+  multimeter before wiring mains-voltage devices, and put the humidifier/
+  fan/light on the LOAD side of the relay, not the ESP32 itself.
+*/
+
+#include &lt;DHT.h&gt;
+#include &lt;WiFi.h&gt;
+#include &lt;time.h&gt;
+
+// ---------- Pin map ----------
+#define DHTPIN 4
+#define DHTTYPE DHT22
+
+#define RELAY_HUMID 26   // humidifier
+#define RELAY_FAN   27   // exhaust fan
+#define RELAY_LIGHT 14   // grow light
+#define RELAY_SPARE 12   // circulation fan / spare
+
+// If you have an MH-Z19B CO2 sensor on UART2 (RX=16, TX=17), set this true.
+#define HAS_CO2_SENSOR false
+
+#if HAS_CO2_SENSOR
+  #include &lt;MHZ19.h&gt;
+  HardwareSerial co2Serial(2);
+  MHZ19 mhz19;
+#endif
+
+DHT dht(DHTPIN, DHTTYPE);
+
+// ---------- WiFi (for NTP-based light schedule) ----------
+const char* WIFI_SSID     = "YOUR_WIFI_SSID";
+const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
+const char* NTP_SERVER    = "pool.ntp.org";
+const long  GMT_OFFSET_SEC = 0;   // set to your timezone offset in seconds
+const int   DST_OFFSET_SEC = 0;
+
+// ---------- Setpoints (oyster mushroom, fruiting) ----------
+const float HUMIDITY_LOW  = 87.0;  // humidifier turns ON below this
+const float HUMIDITY_HIGH = 92.0;  // humidifier turns OFF above this
+const float TEMP_HIGH     = 24.0;  // fan assists cooling above this
+const int   CO2_HIGH_PPM  = 1000;  // fan turns ON above this (if CO2 sensor present)
+const int   CO2_LOW_PPM   = 800;   // fan turns OFF below this
+
+// FAE fallback (no CO2 sensor): run fan for FAE_MINUTES every FAE_INTERVAL_MIN
+const unsigned long FAE_INTERVAL_MIN = 60;
+const unsigned long FAE_MINUTES      = 5;
+
+const int LIGHT_ON_HOUR  = 8;    // 24h clock
+const int LIGHT_OFF_HOUR = 20;   // 12h photoperiod
+
+const unsigned long SENSOR_READ_INTERVAL_MS = 10000;  // read every 10s
+const unsigned long POST_FAE_HUMID_BURST_MS = 60000;  // 1 min humidifier burst after FAE
+
+// ---------- State ----------
+unsigned long lastSensorRead = 0;
+unsigned long lastFaeStart   = 0;
+unsigned long faeStartedAt   = 0;
+unsigned long humidBurstUntil = 0;
+
+bool fanOn   = false;
+bool humidOn = false;
+bool lightOn = false;
+
+void setRelay(int pin, bool on) {
+  // most relay boards are active-LOW; flip this if yours is active-HIGH
+  digitalWrite(pin, on ? LOW : HIGH);
+}
+
+void setup() {
+  Serial.begin(115200);
+  dht.begin();
+
+  pinMode(RELAY_HUMID, OUTPUT);
+  pinMode(RELAY_FAN, OUTPUT);
+  pinMode(RELAY_LIGHT, OUTPUT);
+  pinMode(RELAY_SPARE, OUTPUT);
+  setRelay(RELAY_HUMID, false);
+  setRelay(RELAY_FAN, false);
+  setRelay(RELAY_LIGHT, false);
+  setRelay(RELAY_SPARE, false);
+
+  #if HAS_CO2_SENSOR
+    co2Serial.begin(9600, SERIAL_8N1, 16, 17);
+    mhz19.begin(co2Serial);
+    mhz19.autoCalibration(false);  // manual calibration recommended for grow tents
+  #endif
+
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting to WiFi");
+  unsigned long start = millis();
+  while (WiFi.status() != WL_CONNECTED &amp;&amp; millis() - start &lt; 15000) {
+    delay(500);
+    Serial.print(".");
+  }
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\nWiFi connected.");
+    configTime(GMT_OFFSET_SEC, DST_OFFSET_SEC, NTP_SERVER);
+  } else {
+    Serial.println("\nWiFi failed - light schedule will not run until reconnected.");
+  }
+}
+
+void loop() {
+  unsigned long now = millis();
+
+  if (now - lastSensorRead &gt;= SENSOR_READ_INTERVAL_MS) {
+    lastSensorRead = now;
+    readAndControl();
+  }
+
+  controlLightSchedule();
+}
+
+void readAndControl() {
+  float humidity = dht.readHumidity();
+  float tempC = dht.readTemperature();
+
+  if (isnan(humidity) || isnan(tempC)) {
+    Serial.println("DHT read failed - skipping this cycle.");
+    return;
+  }
+
+  int co2 = -1;
+  #if HAS_CO2_SENSOR
+    co2 = mhz19.getCO2();
+  #endif
+
+  Serial.printf("RH: %.1f%%  Temp: %.1fC  CO2: %d ppm\n", humidity, tempC, co2);
+
+  // --- Humidity control (hysteresis) ---
+  if (humidity &lt; HUMIDITY_LOW) humidOn = true;
+  else if (humidity &gt; HUMIDITY_HIGH) humidOn = false;
+
+  // --- Fan control ---
+  bool needsFae = false;
+  #if HAS_CO2_SENSOR
+    if (co2 &gt; CO2_HIGH_PPM) needsFae = true;
+    else if (co2 &lt; CO2_LOW_PPM) needsFae = false;
+    else needsFae = fanOn;  // hold state inside the band
+  #else
+    // Timed fallback FAE cycle
+    if (millis() - lastFaeStart &gt;= FAE_INTERVAL_MIN * 60000UL) {
+      lastFaeStart = millis();
+      faeStartedAt = millis();
+      needsFae = true;
+    } else if (fanOn &amp;&amp; millis() - faeStartedAt &lt; FAE_MINUTES * 60000UL) {
+      needsFae = true;
+    }
+  #endif
+
+  // Temperature can also force the fan on regardless of CO2/timer
+  if (tempC &gt; TEMP_HIGH) needsFae = true;
+
+  bool faeJustEnded = (fanOn &amp;&amp; !needsFae);
+  fanOn = needsFae;
+
+  if (faeJustEnded) {
+    // ventilation just dropped humidity - force a short humidifier burst
+    humidBurstUntil = millis() + POST_FAE_HUMID_BURST_MS;
+  }
+  if (millis() &lt; humidBurstUntil) humidOn = true;
+
+  setRelay(RELAY_HUMID, humidOn);
+  setRelay(RELAY_FAN, fanOn);
+
+  Serial.printf("-&gt; Humidifier: %s  Fan: %s\n", humidOn ? "ON" : "off", fanOn ? "ON" : "off");
+}
+
+void controlLightSchedule() {
+  struct tm timeinfo;
+  if (!getLocalTime(&amp;timeinfo, 100)) return;  // NTP not synced yet
+
+  int hour = timeinfo.tm_hour;
+  bool shouldBeOn = (hour &gt;= LIGHT_ON_HOUR &amp;&amp; hour &lt; LIGHT_OFF_HOUR);
+
+  if (shouldBeOn != lightOn) {
+    lightOn = shouldBeOn;
+    setRelay(RELAY_LIGHT, lightOn);
+    Serial.printf("Light -&gt; %s\n", lightOn ? "ON" : "off");
+  }
+}
+</code></pre>
+  </details>
+  <p class="hint">Set your Wi-Fi name and password at the top, set <code>HAS_CO2_SENSOR</code> to true if you fit an MH-Z19B, and check your relay polarity before connecting mains loads.</p>
+</section>
+
+<section class="rv">
+  <h2><small>Testing</small>Expected results and validation plan</h2>
+  <p style="margin-bottom:18px">These are design-stage expectations, not measured results. They will be replaced with real data once the build is tested.</p>
+  <div class="two2">
+    <div class="grp"><h3>Expected results</h3><ul class="plain" style="gap:6px">
+      <li>Humidity held in the 85–95% band without rapid relay cycling.</li>
+      <li>CO₂ kept below the 800–1000 ppm band by fresh-air exchange.</li>
+      <li>A 12-hour photoperiod that recovers correctly after a power cycle.</li>
+      <li>Lower water and electricity use than manual or timer-only control.</li></ul></div>
+    <div class="grp"><h3>Validation plan</h3><ul class="plain" style="gap:6px">
+      <li>Check relay polarity with a multimeter before any mains load.</li>
+      <li>Bench-test each sensor against a reference hygrometer and thermometer.</li>
+      <li>Run the chamber empty for 24–48 hours to confirm a stable loop.</li>
+      <li>Log relay switching over a full fruiting cycle and widen the hysteresis band if it cycles too often.</li></ul></div>
+  </div>
+</section>
+
+<section class="rv" style="padding-top:0">
+  <a class="back" href="../index.html#projects">← Back to projects</a>
+</section>
+
+<footer>© 2026 Harikrishnan M</footer>
+
+<script>
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+/* sound switch (same setting as the main site) */
+let muted=false; try{muted=localStorage.getItem('hm-muted')==='1'}catch(e){}
+const mb=document.getElementById('muteBtn');
+function setMuted(m){muted=m;mb.textContent=m?'🔇':'🔊';mb.title=m?'Sound off':'Sound on';try{localStorage.setItem('hm-muted',m?'1':'0')}catch(e){}}
+setMuted(muted); mb.onclick=()=>setMuted(!muted);
+let last=0;
+function blip(rate){const n=Date.now(); if(muted||n-last<120) return; last=n;
+  const a=new Audio('../audio/scan.mp3'); a.volume=.35; a.preservesPitch=false; a.webkitPreservesPitch=false; a.playbackRate=rate; a.play().catch(()=>{})}
+
+/* hover / focus / tap on diagram parts shows what they do */
+document.querySelectorAll('.diagram,.flow').forEach(box=>{
+  const info=box.querySelector('[data-info]'), nodes=[...box.querySelectorAll('.node[data-t]')];
+  nodes.forEach((n,i)=>{
+    const show=()=>{nodes.forEach(x=>x.classList.remove('on')); n.classList.add('on');
+      info.innerHTML='<b></b><span style="color:var(--muted)"></span>'; info.firstChild.textContent=n.dataset.t; info.lastChild.textContent=n.dataset.d; blip(.85+(i%8)*.07)};
+    n.addEventListener('pointerenter',show); n.addEventListener('focus',show); n.addEventListener('click',show);
+  });
+});
+
+/* control loop simulator (same setpoints as the firmware) */
+const $=id=>document.getElementById(id);
+let humidOn=false, fanOn=false, burstUntil=0, prev={h:null,f:null,l:null};
+function setLamp(el,on){el.classList.toggle('on',on); el.querySelector('span').textContent=on?'ON':'OFF'}
+function sim(){
+  const rh=+$('rh').value, tc=+$('tc').value, co=+$('co').value, hr=+$('hr').value;
+  $('vRh').textContent=rh+'%'; $('vT').textContent=tc+' °C'; $('vCo').textContent=co+' ppm'; $('vH').textContent=String(hr).padStart(2,'0')+':00';
+  const notes=[];
+  if(rh<87){humidOn=true;notes.push('Humidity is below 87%, so the humidifier turns on.')}
+  else if(rh>92){humidOn=false;notes.push('Humidity is above 92%, so the humidifier turns off.')}
+  else notes.push('Humidity is inside the 87–92% band, so the humidifier keeps its last state (hysteresis).');
+  let need=fanOn;
+  if(co>1000){need=true;notes.push('CO₂ is above 1000 ppm, so the fan runs for fresh air.')}
+  else if(co<800) need=false;
+  if(tc>24){need=true;notes.push('Temperature is above 24 °C, so the fan is forced on to cool.')}
+  if(fanOn&&!need){burstUntil=Date.now()+6000;notes.push('The fan just stopped, so the humidifier gets a short burst to make up the lost humidity.')}
+  fanOn=need;
+  const burst=Date.now()<burstUntil; if(burst) humidOn=true;
+  const lit=hr>=8&&hr<20;
+  setLamp($('lHum'),humidOn); setLamp($('lFan'),fanOn); setLamp($('lLit'),lit);
+  notes.push(lit?'It is between 08:00 and 20:00, so the grow light is on.':'It is outside 08:00–20:00, so the grow light is off.');
+  $('why').textContent=notes.join(' ');
+  if(prev.h!==null&&(prev.h!==humidOn||prev.f!==fanOn||prev.l!==lit)) blip(humidOn!==prev.h?1:fanOn!==prev.f?1.2:.85);
+  prev={h:humidOn,f:fanOn,l:lit};
+}
+['rh','tc','co','hr'].forEach(id=>$(id).addEventListener('input',sim));
+setInterval(()=>{ if(burstUntil&&Date.now()>burstUntil){burstUntil=0;sim()} },500);
+sim();
+
+/* copy code */
+$('copyBtn').onclick=async()=>{
+  try{await navigator.clipboard.writeText($('src').textContent); $('copyBtn').textContent='Copied ✓'}catch(e){$('copyBtn').textContent='Select the code and press Ctrl+C'}
+  setTimeout(()=>$('copyBtn').textContent='Copy code',1800); blip(1.1);
+};
+
+/* spores rising in the hero */
+if(!still){const h=document.querySelector('.hero');
+  for(let i=0;i<16;i++){const b=document.createElement('i');b.className='bub';const s=5+Math.random()*14;
+    b.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;animation-duration:${9+Math.random()*10}s;animation-delay:${-Math.random()*12}s`;h.appendChild(b)}}
+else document.querySelectorAll('circle animateMotion').forEach(a=>a.parentNode.remove());
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
